@@ -1,5 +1,6 @@
 # clear workspace
 rm(list=ls())
+# this is the R package to solve the system of ODEs 
 require(deSolve)
 # need to invert matrices
 require(matlib)
