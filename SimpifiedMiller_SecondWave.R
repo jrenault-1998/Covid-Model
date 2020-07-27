@@ -10,34 +10,49 @@ library(curl)
 # You need to write your own path here
 ###setwd('~/Desktop/MUN COVID/Second Wave/Figures/')
 
-# The code below is commented out because it's just an illustrative graph
-# about something else
-# x = seq(1,5,1)
-# x2 = seq(1,5,.1)
-# y = 10*exp(-(x-1))
-# par(mar=c(5,3,2,2)+0.1)
-# png(file="well-being.png",width=500,height=450)
-# plot(x,y,pch=19, xlab = "Alert level", ylab = "", bty="n",yaxt="n", cex.lab=2, cex = 1.5, cex.axis=1.5)
-# title(ylab="Well-being", line=1, cex.lab=2)
-# axis(side=2,labels = FALSE, tck=0)
-# lines(x2,10*exp(-(x2-1)),lwd=1.5)
-# lines(c(1,5),c(10,10*exp(-4)),lty=2,lwd=2)
-# dev.off()
 
-#data <- data.table::fread('https://raw.githubusercontent.com/wzmli/COVID19-Canada/master/COVID19_Canada.csv', fill = TRUE)[Province == 'ON']
+# Parameters as proposed for the new model
 
-# Parameters which should be a direct copy of Miller et al.
-# See Miller et al. for definitions.
+# Contact Tracing parameter (Placeholder value)
+phi <- 1
+
+#Prob. going from Q to S (Placeholder value)
+pi_0 <- 1
+
+#Prob. going from Q to RS (Placeholder value)
+pi_S <- 1
+
+#Prob. going from Q to RA (Placeholder value)
+pi_A <- 1
+
+#decrease in asymptomatic infectivity
 bA <- 0.5
+
+#decrease in Clynical infectivity
+bC <- 0.1
+
+#mean time spent in Exposed
 deltaE <- 1/4
+
+#mean time spent in Infected_Pre-Clinical
 deltaP <- 1/2.4
+
+#mean time spent in Infected_Clinical
 deltaC <- 1/3.2
+
+#mean time spent in Infected_Asymptomatic
 deltaA <- 1/7
+
+#mean time spent in Q (Placeholder value)
+deltaQ <- 1/2
+
 # Rate of quarantine due to contact tracing
 lambda = 1/5
+
 # R0 after re-escalation
 R0c <- 0.5
-bC <- 0.1
+
+#Is N supposed to be population?
 N<-1
 
 # Added importations since initial conditions of one exposed gives
@@ -137,8 +152,10 @@ Miller.CT = function(t,y,parms){
   IA <- y[5]
   RS <- y[6]
   RA <- y[7]
+  Q <- y[8]
   
-  dS = -S*beta.fun(t)*(IP+bC*IC+bA*IA)/N
+  dS = -S*beta.fun(t)*(IP+bC*IC+bA*IA+phi*Q)/N + pi_0*deltaQ*Q
+  
   dE = tau.fun(t)+S*beta.fun(t)*(IP+bC*IC+bA*IA)/N-deltaE*E - lambda*E
   dIP = r*deltaE*E-deltaP*IP - lambda*IP
   dIC = deltaP*IP-deltaC*IC - lambda*IC
