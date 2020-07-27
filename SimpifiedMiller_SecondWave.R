@@ -157,11 +157,17 @@ Miller.CT = function(t,y,parms){
   dS = -S*beta.fun(t)*(IP+bC*IC+bA*IA+phi*Q)/N + pi_0*deltaQ*Q
   
   dE = tau.fun(t)+S*beta.fun(t)*(IP+bC*IC+bA*IA)/N-deltaE*E - lambda*E
+  
   dIP = r*deltaE*E-deltaP*IP - lambda*IP
+  
   dIC = deltaP*IP-deltaC*IC - lambda*IC
+  
   dIA = (1-r)*deltaE*E - deltaA*IA - lambda*IA
+  
   dRS = deltaC*IC - r*lambda*E + lambda*IP + lambda*IC
+  
   dRA = deltaA*IA - (1-r)*lambda*E + lambda*IA
+  
   # cumulative clinical cases
   dcumIC = deltaP*IP
   
