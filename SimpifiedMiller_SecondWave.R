@@ -28,7 +28,7 @@ pi_A <- 1
 #decrease in asymptomatic infectivity
 bA <- 0.5
 
-#decrease in Clynical infectivity
+#decrease in Clinical infectivity
 bC <- 0.1
 
 #mean time spent in Exposed
