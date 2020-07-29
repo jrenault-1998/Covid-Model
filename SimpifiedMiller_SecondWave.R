@@ -52,48 +52,36 @@ lambda = 1/5
 # R0 after re-escalation
 R0c <- 0.5
 
-#Is N supposed to be population?
-N<-1
+
 
 # Added importations since initial conditions of one exposed gives
 # very slow initial growth of the outbreak.
 tau <- 50/519705
 
-# vector of age-structured asymptomatic rates from Miller et al.
-ri <- c(0.056, 0.056, 0.129, 0.281, 0.429, 0.490, 0.740, 0.740, 0.740)
+#hospitalization given clinical infection
+r <- 0.85
 
-# vector of age-structured hospitalization rates for symptomatic cases
-h_r = c(0.001, 0.003, 0.012, 0.032, 0.049, 0.102, 0.166, 0.243, 0.273)
+#asymptomatic rate
+ri <- 0.1
 
-# vector of age-structured ICU rates given hospitalization
-i_r = c(0.05, 0.05, 0.05, 0.05, 0.063, 0.122, 0.274, 0.432, 0.709)
+#hospitalization rates for symptomatic cases
+h_r = 0.1
 
-# Number of NLers in each age category from 2016 census data
-n_09 = 22365+26040
-n_1019 = 26035+27255
-n_2029 = 27700+28245
-n_3039 = 29405+30740
-n_4049 = 34505+38665
-n_5059 = 42620+43080
-n_6069 = 42025+37485
-n_7079 = 26170+16950
-n_80p = 11060+9360
+#ICU rates given hospitalization
+i_r = 0.1
 
-# Vectorize and convert to fractions
-age.frac = c(n_09, n_1019, n_2029, n_3039, n_4049, n_5059, n_6069, n_7079,n_80p)
-tot.popn = sum(age.frac)
+
+# Vectorize and convert to fractions (Not sure what of this is still needed)
+age.frac = 1
+tot.popn = 100000
 age.frac = age.frac/tot.popn
 
-# Calculate average r, hospitalization given clinical infection, ICU given hospitalization
-# Early on, I had been considering doing this model with age-structure, but I ended up
-# deciding that the age-structure wasn't a critical piece, so it gets removed here.
-r <- sum(ri*age.frac)
-# Overwrite the calculation of r to be consistent with JC's work - specifically,
+
 # we found that for the NL data, if it were assumed that asymptomatics were
 # greater than 20% of infections the fit of this model to data was poor.
-r <- 0.85
-av.hosp <- sum(h_r*age.frac)
-av.ICU <-  sum(i_r*age.frac)
+
+av.hosp <- 0.1
+av.ICU <-  0.05
 
 # Given a user supplied R0, calculate the beta
 find.beta = function(beta,R0){
@@ -144,6 +132,9 @@ beta.fun = function(t){
 
 # This is the system of ODEs for Miller et al., but modified so that individuals
 # go into isolation due to contact tracing at rate lambda.
+
+## The following has only been partially updated (Not entirely sure options out of Q)
+
 Miller.CT = function(t,y,parms){
   S <- y[1]
   E <- y[2]
@@ -261,6 +252,9 @@ plot(SDstart.vec, LDend[,1], typ = "l", ylab = "lockdown duration (days)", xlab 
 lines(SDstart.vec, LDend[,2])
 lines(SDstart.vec, LDend[,3])
 dev.off()
+
+
+## Are we keeping the following? If so, how are we using it?
 
 # The code below should be ignored. This is a start on writing some code for
 # contact tracing with limited resources such that when too many individuals
