@@ -17,13 +17,13 @@ library(curl)
 phi <- 1
 
 #Prob. going from Q to S (Placeholder value)
-pi_0 <- 1
-
-#Prob. going from Q to RS (Placeholder value)
 pi_S <- 1
 
+#Prob. going from Q to RS (Placeholder value)
+pi_RS <- 1
+
 #Prob. going from Q to RA (Placeholder value)
-pi_A <- 1
+pi_RA <- 1
 
 #decrease in asymptomatic infectivity
 bA <- 0.5
@@ -145,19 +145,22 @@ Miller.CT = function(t,y,parms){
   RA <- y[7]
   Q <- y[8]
   
-  dS = -S*beta.fun(t)*(IP+bC*IC+bA*IA+phi*Q)/N + pi_0*deltaQ*Q
+  dS = -S*beta.fun(t)*(IP+bC*IC+bA*IA+phi*Q)/N + pi_S*deltaQ*Q
   
-  dE = tau.fun(t)+S*beta.fun(t)*(IP+bC*IC+bA*IA)/N-deltaE*E - lambda*E
+  dE = [tau.fun(t) - lambda*E] + S*beta.fun(t)*(IP+bC*IC+bA*IA)/N-deltaE*E
   
-  dIP = r*deltaE*E-deltaP*IP - lambda*IP
+  dIP = r*deltaE*E-deltaP*IP - lambda*IP + pi_IP*deltaQ*Q
   
   dIC = deltaP*IP-deltaC*IC - lambda*IC
   
-  dIA = (1-r)*deltaE*E - deltaA*IA - lambda*IA
+  ## Not sure if its possible to still have COVID after 14days if asymptomatic
+  dIA = (1-r)*deltaE*E - deltaA*IA - lambda*IA + pi_IA*deltaQ*Q
   
   dRS = deltaC*IC - r*lambda*E + lambda*IP + lambda*IC
   
-  dRA = deltaA*IA - (1-r)*lambda*E + lambda*IA
+  dRA = deltaA*IA - (1-r)*lambda*E + lambda*IA + pi_RA*deltaQ*Q
+  
+  dQ = S*beta.fun(t)*(phi*Q)/N - deltaQ*Q
   
   # cumulative clinical cases
   dcumIC = deltaP*IP
