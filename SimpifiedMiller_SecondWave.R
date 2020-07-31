@@ -6,6 +6,8 @@ require(matlib)
 library(data.table)
 library(curl)
 
+# AMY did some work here
+
 # Set this working directory to where you want to save the figures.
 # You need to write your own path here
 ###setwd('~/Desktop/MUN COVID/Second Wave/Figures/')
