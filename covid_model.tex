@@ -1,0 +1,42 @@
+\documentclass[12pt]{article}
+\usepackage[utf8x]{inputenc}  
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumerate}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
+
+\title{COVID-19 Model Containing Contact Tracing and Quarantine}
+\date{}
+
+\begin{document} 
+
+\maketitle
+
+\section{Model Equations} \label{equations}
+
+\begin{equation}
+\begin{aligned}
+\frac{dS}{dt} &=  - S \beta \left( \frac{I_P + b_CI_C + b_AI_A}{N}\right) -\lambda S + \delta_{Q_S}  Q_S \\
+\frac{dE}{dt} &= S \beta \left( \frac{I_P + b_CI_C + b_AI_A}{N}\right)  -\lambda E - \delta_E E \\
+\frac{dI_P}{dt} &= r\delta_E E - \delta_{I_P} I_P\\
+\frac{dI_C}{dt} &= \delta_{I_P} I_P - \delta_{I_C} I_C\\
+\frac{dI_A}{dt} &= (1-r) \delta_E E - \lambda I_A - \delta_{I_A} I_A\\
+\frac{dR_S}{dt} &= \delta_{I_C} I_C +  \delta_{Q_{R_S}} Q_{R_S}\\
+\frac{dR_A}{dt} &= \delta_{I_A} I_A - \lambda R_A + \delta_{Q_{RA}} Q_{R_A}\\
+\frac{dQ_S}{dt} &= \lambda S  - \delta_{Q_S} Q_{S}\\
+\frac{dQ_E}{dt} &= \lambda E - \delta_E Q_E\\
+\frac{dQ_{I_P}}{dt} &= r \delta_E Q_E -\delta_{I_P} Q_{I_P}\\
+\frac{dQ_{I_C}}{dt} &= \delta_{I_P} Q_{I_P} - \delta_{I_C} Q_{I_C}\\
+\frac{dQ_{I_A}}{dt} &= \lambda I_A + (1-r)\delta_E Q_E -\delta_{I_A} Q_{I_A}\\
+\frac{dQ_{R_S}}{dt} &= \delta_{I_C} Q_{I_C} - \delta_{Q_{R_S}} Q_{R_S}\\
+\frac{dQ_{R_A}}{ dt} &= \lambda R_A -\delta_{Q_{R_A}}Q_{R_A} + \delta_{I_A} Q_{I_A}
+\end{aligned}
+\end{equation}
+
+
+\section{Parameters} \label{parameters}
+Parameters have similar meaning to that of Miller model with a few additions.
+
+
+\end{document}
