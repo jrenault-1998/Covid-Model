@@ -1,0 +1,43 @@
+\documentclass[12pt]{article}
+\usepackage[utf8x]{inputenc}  
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumerate}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
+
+\title{COVID-19 Model Containing Contact Tracing and Quarantine}
+\date{}
+
+\begin{document} 
+
+\maketitle
+
+\section{Model Equations} \label{equations}
+
+The previous model it is unclear what is meant by quarantining. Quarantining of symptomatic people? Then why are $S$ and $E$ quarantined? Or is instead what is intended self-isolation? If so, why are $I_P$ not potentially placed into self-isolation?
+
+Below is what I suggest for the formulation of contact-tracing:
+
+\begin{eqnarray}
+\frac{dS}{dt} &=&  - S a c \left( \frac{I_P + b_CI_C + b_AI_A}{N}\right)  + \delta_{Q_S}  Q_S \\
+\frac{dE}{dt} &=& (1-\lambda)S a c \left( \frac{I_P + b_CI_C}{N}\right) + S ac \frac{b_A I_A}{N}  - \delta_E E \\
+\frac{dI_P}{dt} &=& r\delta_E E - \delta_{I_P} I_P\\
+\frac{dI_C}{dt} &=& \delta_{I_P} I_P - \delta_{I_C} I_C\\
+\frac{dI_A}{dt} &=& (1-r) \delta_E E - \delta_{I_A} I_A\\
+\frac{dR_S}{dt} &=& \delta_{I_C} I_C +  \delta_{Q_{R_S}} Q_{R_S} - \lambda a c R_S \left( \frac{I_P + b_CI_C}{N}\right)\\
+\frac{dR_A}{dt} &=& \delta_{I_A} I_A + \delta_{Q_{RA}} Q_{R_A} - \lambda a c R_A \left( \frac{I_P + b_CI_C}{N}\right)  \\
+\frac{dQ_S}{dt} &=& \lambda S (1-a) c \left( \frac{I_P + b_CI_C}{N}\right) - \delta_{Q_S}  Q_S \\
+\frac{dQ_E}{dt} &=&\lambda S a c \left( \frac{I_P + b_CI_C}{N}\right)  - \delta_E Q_E\\
+\frac{dQ_{I_P}}{dt} &=& r \delta_E Q_E -\delta_{I_P} Q_{I_P}\\
+\frac{dQ_{I_C}}{dt} &=& \delta_{I_P} Q_{I_P} - \delta_{I_C} Q_{I_C}\\
+\frac{dQ_{I_A}}{dt} &=&  (1-r)\delta_E Q_E -\delta_{I_A} Q_{I_A}\\
+\frac{dQ_{R_S}}{dt} &=& \lambda a c R_S \left( \frac{I_P + b_CI_C}{N}\right)+\delta_{I_C} Q_{I_C} - \delta_{Q_{R_S}} Q_{R_S}\\
+\frac{dQ_{R_A}}{ dt} &=& \lambda a c R_A \left( \frac{I_P + b_CI_C}{N}\right) +\delta_{I_A} Q_{I_A} - \delta_{Q_{R_A}}Q_{R_A}
+\end{eqnarray}
+
+where $a$ is the probability of infection given a contact, $c$ is the rate of contact between individuals, and $\lambda$ is the probability that an infected individual is placed in quarantine after having been identified as a contact. I recommend drawing out this model to check it and also reading the relevant sections of the Otto \& Day textbook (available at MUN library as an ebook).
+
+One assumption of the above formulation is that the rate of being placed into quarantine after being contacted is the same for $I_P$ and $I_C$, however, this would not be true since $I_P$ is not likely to have yet tested positive. However, correcting this make the system of ODEs very large, and it might be better to move to a system of delay differential equations.
+
+\end{document}
