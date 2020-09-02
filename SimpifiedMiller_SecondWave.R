@@ -87,17 +87,16 @@ Miller.CT = function(t, y, parms) {
   
   for (i in 1:t) {
     
-
     model_matrix["S", i + 1] =   model_matrix["S", i]
       #got infected today
       -model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + bC * model_matrix["I_c", i] + bA * model_matrix["I_a", i])
       #didn't get infected, still contacted
-      -r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * (1 - beta) * q * c * (for (j in 0:tau) {
+      -r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * (1 - beta) * q * c * (for (j in 0:tau - 1) {
         x <- 0
         x <- x + model_matrix["S", i - j]
       } 
-        b_c * x
-      + for (j in tau:(tau + 1 / deltaI_p)) {
+        b_c * x)
+      + for (j in tau:(tau + 1 / deltaI_p) {
         x <- 0
         x <- x + model_matrix["S", i - j]
       } 
@@ -115,7 +114,7 @@ Miller.CT = function(t, y, parms) {
         x <- x + model_matrix["S", i - j]
       } 
         b_c * x
-      + for (j in tau:(tau + 1 / deltaI_p)) {
+      + for (j in tau:(tau + 1 / deltaE)) {
          x <- 0
          x <- x + model_matrix["S", i - j]
       }
@@ -150,7 +149,7 @@ Miller.CT = function(t, y, parms) {
       #new to I_a
       + (1 - r) * deltaE * model_matrix["E", i]  
       #getting contacted from when they were infected
-      - (1 - r) * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 1 / deltaE:tau + 1 / deltaI_p) {
+      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 1 / deltaE:tau + 1 / deltaI_p) {
         x <- 0
         x <- x + model_matrix["S", i - j]
       }
@@ -193,7 +192,7 @@ Miller.CT = function(t, y, parms) {
       
     model_matrix["S_q", i + 1] = model_matrix["Q_a", i + 1]
       #quarantined by cantact tracing
-      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 0:tau) {
+      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * (1 - beta) * (for (j in 0:tau) {
         x <- 0
         x <- x + model_matrix["S", i - j]
       }
