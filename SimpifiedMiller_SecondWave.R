@@ -87,19 +87,20 @@ Miller.CT = function(t, y, parms) {
   
   for (i in 1:t) {
     
+
     model_matrix["S", i + 1] =   model_matrix["S", i]
       #got infected today
-      -model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + bC * model_matrix["I_c", i] + bA * model_matrix["I_a", i])
+      -model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + b_c * model_matrix["I_c", i] + b_a * model_matrix["I_a", i])
       #didn't get infected, still contacted
       -r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * (1 - beta) * q * c * (for (j in 0:tau - 1) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      } 
-        b_c * x)
-      + for (j in tau:(tau + 1 / deltaI_p) {
+        } 
+        b_c * x
+        + for (j in tau:(tau + 1 / deltaI_p)) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      } 
+        } 
         x)
       #finished quarantine, never had it
       +deltaS_q * model_matrix["S_q", i]
@@ -107,30 +108,30 @@ Miller.CT = function(t, y, parms) {
  
     model_matrix["E", i + 1] =   model_matrix["E", i]
       #got infected today
-      +model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + bC * model_matrix["I_c", i] + bA * model_matrix["I_a", i])
+      + model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + b_c * model_matrix["I_c", i] + b_a * model_matrix["I_a", i])
       #getting contacted from when they were infected
-      -r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (for (j in 0:tau) {
+      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (for (j in 0:tau - 1) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      } 
+        } 
         b_c * x
-      + for (j in tau:(tau + 1 / deltaE)) {
+        + for (j in tau:(1 / deltaE - 1)) {
          x <- 0
          x <- x + model_matrix["S", i - j]
-      }
+        }
         x)
       #going to I_p or I_a
-      -deltaE * model_matrix["E", i]
+      - deltaE * model_matrix["E", i]
     
   
     model_matrix["I_p", i + 1] =  model_matrix["I_p", i]
       #new to I_p
       + r * deltaE * model_matrix["E", i] 
       #getting contacted from when they were infected
-      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 1 / deltaE:tau + 1 / deltaI_p) {
+      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 1 / deltaE:(tau + 1 / deltaI_p - 1)) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      }
+        }
         b_c * x)
       #going to I_c
       - deltaI_p * model_matrix["I_p", i]
@@ -139,6 +140,8 @@ Miller.CT = function(t, y, parms) {
     model_matrix["I_c", i + 1] =  model_matrix["I_c", i]
       #from I_p
       + deltaI_p * model_matrix["I_p", i]
+      #went to Q not I_c
+      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * b_c * model_matrix["S", i - (tau + 1 / deltaI_p)]
       #from Q
       + deltaQ * model_matrix["Q", i]
       #recovering
@@ -149,10 +152,10 @@ Miller.CT = function(t, y, parms) {
       #new to I_a
       + (1 - r) * deltaE * model_matrix["E", i]  
       #getting contacted from when they were infected
-      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 1 / deltaE:tau + 1 / deltaI_p) {
+      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 1 / deltaE:(tau + 1 / deltaI_p)) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      }
+        }
         b_c * x)
       #recovering
       - deltaI_a * model_matrix["I_a", i]
@@ -160,31 +163,31 @@ Miller.CT = function(t, y, parms) {
     
     model_matrix["Q", i + 1] = model_matrix["Q", i + 1]
       #quarantined by cantact tracing
-      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 0:tau) {
+      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 0:tau - 1) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      }
+        }
         b_c * x
-      + for (j in tau:tau + 1/deltaI_p) {
+        + for (j in tau:tau + 1/deltaI_p) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      }
+        }
         x)
       #left due to (+ve) COVID test
-      -deltaQ * model_matrix["Q", i]
+      - deltaQ * model_matrix["Q", i]
     
       
     model_matrix["Q_a", i + 1] = model_matrix["Q_a", i + 1]
       #quarantined by cantact tracing
-      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 0:tau) {
+      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 0:tau - 1) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      }
+        }
         b_c * x
-      + for (j in tau:tau + 1/deltaI_p) {
+        + for (j in tau:tau + 1/deltaI_p) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      }
+        }
         x)
       #finished quarantine
       -deltaQ_a * model_matrix["Q_a", i]
@@ -192,22 +195,20 @@ Miller.CT = function(t, y, parms) {
       
     model_matrix["S_q", i + 1] = model_matrix["Q_a", i + 1]
       #quarantined by cantact tracing
-      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * (1 - beta) * (for (j in 0:tau) {
+      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * (1 - beta) * (for (j in 0:tau - 1) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      }
+        }
         b_c * x
-      + for (j in tau:tau + 1/deltaI_p) {
+        + for (j in tau:tau + 1/deltaI_p) {
         x <- 0
         x <- x + model_matrix["S", i - j]
-      }
+        }
         x)
       #finished quarantine
-      -deltaS_q * model_matrix["S_q", i]
+      - deltaS_q * model_matrix["S_q", i]
       
   }
-  
-  return(list(c(dS, dE, dIP, dIC, dIA, dRS, dRA, dcumIC)))
 }
 
 # Assumed the epidemic begins with 3 exposed.
@@ -478,4 +479,6 @@ dev.off()
 # lines(out$time, out$IC*tot.popn, typ = "l", col="blue")
 #
 # 
+
+
 
