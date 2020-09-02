@@ -59,8 +59,9 @@ deltaS_q <- 1 / 2
 # Days for test results (Placeholder value)
 tau <- 1 / 2
 
-# Population size (Placeholder value)
-N <- 1000000
+# Population size
+N <- 1000000000
+
 
 
 # The following is a series adjusted for quarantining given contact tracing, adjusted using Miller et. al & Tang et. al
@@ -68,335 +69,335 @@ N <- 1000000
 ## The following has only been partially updated (Not entirely sure options out of Q)
 
 
-Miller.CT = function(t, y, parms) {
-  S   <- y[1]
-  E   <- y[2]
-  I_p <- y[3]
-  I_c <- y[4]
-  I_a <- y[5]
-  Q   <- y[6]
-  Q_a <- y[7]
-  S_q <- y[8]
-  
+Miller.CT <- function(t, y) {
   matrix_size <- t * 8
   
   #creating the matrix
-  model_matrix <- matrix(1:matrix_size, ncol = 8)
-  colnames(model_matrix) <-
-    c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q")
+  model_matrix <- matrix(, ncol = 8, nrow = t)
+  colnames(model_matrix) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q")
   
-  for (i in 1:t) {
+  model_matrix["S", 1]   = y[1]
+  model_matrix["E", 1]   = y[2]
+  model_matrix["I_p", 1] = y[3]
+  model_matrix["I_c", 1] = y[4]
+  model_matrix["I_a", 1] = y[5]
+  model_matrix["Q", 1]   = y[6]
+  model_matrix["Q_a", 1] = y[7]
+  model_matrix["S_q", 1] = y[8]
+  
+  for (i in 1:t - 1) {
     
-
+    
     model_matrix["S", i + 1] =   model_matrix["S", i]
-      #got infected today
-      -model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + b_c * model_matrix["I_c", i] + b_a * model_matrix["I_a", i])
-      #didn't get infected, still contacted
-      -r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * (1 - beta) * q * c * (for (j in 0:tau - 1) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        } 
-        b_c * x
-        + for (j in tau:(tau + 1 / deltaI_p)) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        } 
-        x)
-      #finished quarantine, never had it
-      +deltaS_q * model_matrix["S_q", i]
+    #got infected today
+    - model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + b_c * model_matrix["I_c", i] + b_a * model_matrix["I_a", i])
+    #didn't get infected, still contacted
+    - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * (1 - beta) * q * c * (for (j in 0:tau - 1) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      b_c * x
+      } 
+      + for (j in tau:(tau + 1 / deltaI_p)) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      x
+      })
+    #finished quarantine, never had it
+    + deltaS_q * model_matrix["S_q", i]
     
- 
+    
     model_matrix["E", i + 1] =   model_matrix["E", i]
-      #got infected today
-      + model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + b_c * model_matrix["I_c", i] + b_a * model_matrix["I_a", i])
-      #getting contacted from when they were infected
-      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (for (j in 0:tau - 1) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        } 
-        b_c * x
-        + for (j in tau:(1 / deltaE - 1)) {
-         x <- 0
-         x <- x + model_matrix["S", i - j]
-        }
-        x)
-      #going to I_p or I_a
-      - deltaE * model_matrix["E", i]
+    #got infected today
+    + model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + b_c * model_matrix["I_c", i] + b_a * model_matrix["I_a", i])
+    #getting contacted from when they were infected
+    - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (for (j in 0:tau - 1) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      b_c * x
+      } 
+      + for (j in tau:(1 / deltaE - 1)) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      x
+      })
+    #going to I_p or I_a
+    - deltaE * model_matrix["E", i]
     
-  
+    
     model_matrix["I_p", i + 1] =  model_matrix["I_p", i]
-      #new to I_p
-      + r * deltaE * model_matrix["E", i] 
-      #getting contacted from when they were infected
-      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 1 / deltaE:(tau + 1 / deltaI_p)) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        }
-        b_c * (x - model_matrix["S", i - 1/deltaI_p]))
-      #going to I_c
-      - deltaI_p * model_matrix["I_p", i]
+    #new to I_p
+    + r * deltaE * model_matrix["E", i] 
+    #getting contacted from when they were infected
+    - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 1 / deltaE:(tau + 1 / deltaI_p)) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      b_c * (x - model_matrix["S", i - 1/deltaI_p])
+      })
+    #going to I_c
+    - deltaI_p * model_matrix["I_p", i]
     
     
     model_matrix["I_c", i + 1] =  model_matrix["I_c", i]
-      #from I_p
-      + deltaI_p * model_matrix["I_p", i]
-      #went to Q not I_c
-      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * b_c * model_matrix["S", i - (tau + 1 / deltaI_p)]
-      #from Q
-      + deltaQ * model_matrix["Q", i]
-      #recovering
-      - deltaI_c * model_matrix["I_c", i]
+    #from I_p
+    + deltaI_p * model_matrix["I_p", i]
+    #went to Q not I_c
+    - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * b_c * model_matrix["S", i - (tau + 1 / deltaI_p)]
+    #from Q
+    + deltaQ * model_matrix["Q", i]
+    #recovering
+    - deltaI_c * model_matrix["I_c", i]
     
     
     model_matrix["I_a", i + 1] =  model_matrix["I_a", i]
-      #new to I_a
-      + (1 - r) * deltaE * model_matrix["E", i]  
-      #getting contacted from when they were infected
-      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 1 / deltaE:(tau + 1 / deltaI_p)) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        }
-        b_c * x)
-      #recovering
-      - deltaI_a * model_matrix["I_a", i]
+    #new to I_a
+    + (1 - r) * deltaE * model_matrix["E", i]  
+    #getting contacted from when they were infected
+    - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 1 / deltaE:(tau + 1 / deltaI_p)) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      b_c * x
+      })
+    #recovering
+    - deltaI_a * model_matrix["I_a", i]
     
     
     model_matrix["Q", i + 1] = model_matrix["Q", i + 1]
-      #quarantined by cantact tracing
-      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 0:tau - 1) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        }
-        b_c * x
-        + for (j in tau:tau + 1/deltaI_p) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        }
-        x)
-      #left due to (+ve) COVID test
-      - deltaQ * model_matrix["Q", i]
+    #quarantined by cantact tracing
+    + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 0:tau - 1) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      b_c * x
+      }
+      + for (j in tau:tau + 1/deltaI_p) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      x
+      })
+    #left due to (+ve) COVID test
+    - deltaQ * model_matrix["Q", i]
     
-      
+    
     model_matrix["Q_a", i + 1] = model_matrix["Q_a", i + 1]
-      #quarantined by cantact tracing
-      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 0:tau - 1) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        }
-        b_c * x
-        + for (j in tau:tau + 1/deltaI_p) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        }
-        x)
-      #finished quarantine
-      -deltaQ_a * model_matrix["Q_a", i]
+    #quarantined by cantact tracing
+    + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 0:tau - 1) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      b_c * x
+      }
+      + for (j in tau:tau + 1/deltaI_p) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      x
+      })
+    #finished quarantine
+    -deltaQ_a * model_matrix["Q_a", i]
     
-      
+    
     model_matrix["S_q", i + 1] = model_matrix["Q_a", i + 1]
-      #quarantined by cantact tracing
-      + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * (1 - beta) * (for (j in 0:tau - 1) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        }
-        b_c * x
-        + for (j in tau:tau + 1/deltaI_p) {
-        x <- 0
-        x <- x + model_matrix["S", i - j]
-        }
-        x)
-      #finished quarantine
-      - deltaS_q * model_matrix["S_q", i]
-      
+    #quarantined by cantact tracing
+    + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * (1 - beta) * (for (j in 0:tau - 1) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      b_c * x
+      }
+      + for (j in tau:tau + 1/deltaI_p) {
+      x <- 0
+      x <- x + model_matrix["S", i - j]
+      x
+      })
+    #finished quarantine
+    - deltaS_q * model_matrix["S_q", i]
+    
   }
 }
 
 # Assumed the epidemic begins with 3 exposed.
-E0 = 3 / tot.popn
+E0 = 3
+
 yini  = c(
-  S = 1,
+  S = (N - E0),
   E = E0,
-  IP = 0,
-  IC = 0,
-  IA = 0,
-  RS = 0,
-  RA = 0,
-  cumIC = 0
+  I_p = 0,
+  I_c = 0,
+  I_a = 0,
+  Q = 0,
+  Q_a = 0,
+  S_q = 0
 )
-# the times for the numerical integration
-times <- seq(0, 365, by = .1)
-# The assumed R0 prior to the higher alert level
-R0 <- 2.5
-beta <- uniroot(find.beta, c(0, 10), R0 = R0)$root
+# # the times for the numerical integration
+# times <- seq(0, 365, by = .1)
+# # The assumed R0 prior to the higher alert level
+# R0 <- 2.5
+# beta <- uniroot(find.beta, c(0, 10), R0 = R0)$root
+# 
+# # Day 7 for the implementation of the higher alert level
+# SDstart <- 7
+# out <- ode(
+#   y = yini,
+#   parms = NULL,
+#   times = times,
+#   func = Miller.CT
+# )
+# out7 <- data.frame(out)
 
-# Day 7 for the implementation of the higher alert level
-SDstart <- 7
-out <- ode(
-  y = yini,
-  parms = NULL,
-  times = times,
-  func = Miller.CT
-)
-out7 <- data.frame(out)
-
-# Day 10 for the implementation of the higher alert level
-SDstart <- 10
-out <- ode(
-  y = yini,
-  parms = NULL,
-  times = times,
-  func = Miller.CT
-)
-out10 <- data.frame(out)
-
-# Making the figure for escalation on day 7 or day 10
-png(file = "reescalation.png",
-    width = 1000,
-    height = 450)
-par(mfrow = c(1, 2), mar = c(5, 6, 3, 1))
-# New daily cases is the derivative of cumulative cases
-plot(
-  tail(out7$time, -1),
-  diff(out7$cumIC) * tot.popn,
-  typ = "l",
-  xlab = "days",
-  ylab = "daily cases",
-  xlim = c(0, 30),
-  main = "Re-escalation on day 7",
-  ylim = c(0, 15),
-  bty = "n",
-  lwd = 3,
-  cex.lab = 2,
-  cex.main = 2,
-  cex.axis = 2
-)
-lines(c(7, 7), c(0, max(out7$IC * tot.popn)), lty = 2, lwd = 2)
-plot(
-  tail(out10$time, -1),
-  diff(out10$cumIC * tot.popn),
-  typ = "l",
-  xlab = "days",
-  ylab = "daily cases",
-  xlim = c(0, 30),
-  main = "Re-escalation on day 10",
-  ylim = c(0, 15),
-  bty = "n",
-  lwd = 3,
-  cex.lab = 2,
-  cex.main = 2,
-  cex.axis = 2
-)
-lines(c(10, 10), c(0, max(out10$IC * tot.popn)), lty = 2, lwd = 2)
-dev.off()
-
-# Loop across escalation days
-SDstart.vec <- seq(0, 20, 1)
-# Preallocate output vector
-out.dat = data.frame("Estart" = NULL)
-Estart = NULL
-ICstart = NULL
-Efinal = NULL
-ICfinal = NULL
-LDend = NULL
-
-# The is a loop across different days that escalation could start
-for (i in seq(1, length(SDstart.vec))) {
-  SDstart <- SDstart.vec[i]
-  # performing the numerical integration
-  out <-
-    ode(
-      y = yini,
-      parms = NULL,
-      times = times,
-      func = Miller.CT
-    )
-  out <- data.frame(out)
-  # recording the number of exposed when re-escalation starts
-  Estart[i] = out$E[which(out$time == SDstart)]
-  # recording the number of clinically infected when re-escalation starts
-  ICstart[i] = out$IC[which(out$time == SDstart)]
-  # recording the number of exposed & clinically infected at the final time
-  Efinal[i] = tail(out$cumE, 1)
-  ICfinal[i] = tail(out$cumIC, 1)
-  # the lockdown is assumed to end when the number of clinically infected
-  # is < 1. The duration of the lockdown is the end time - the start time.
-  LDend[i] = out$time[max(which(out$IC * tot.popn > 1))] - SDstart
-}
-
-# Figure code
-png(file = "dontwait.png",
-    width = 1000,
-    height = 450)
-par(mfrow = c(1, 2), mar = c(5, 6, 3, 1))
-plot(
-  SDstart.vec,
-  tot.popn * ICfinal,
-  ylab = "total clinical infections",
-  xlab = "Days waited till re-escalation start",
-  typ = "l",
-  ylim = c(0, 3000),
-  bty = "n",
-  lwd = 3,
-  cex.lab = 2,
-  cex.main = 2,
-  cex.axis = 2,
-  main = "Delays are bad for public health"
-)
-plot(
-  SDstart.vec,
-  LDend,
-  typ = "l",
-  ylab = "Days at higher alert level",
-  xlab = "Days waited till re-escalation start",
-  bty = "n",
-  lwd = 3,
-  cex.lab = 2,
-  cex.main = 2,
-  cex.axis = 2,
-  main = "Delays are bad for well-being"
-)
-dev.off()
-L = length(SDstart)
-mod = lm(LDend[5:L] ~ SDstart.vec[5:L])
-# Slope is 0.41
-
-# Below the code investigates different R0 values
-R0vec <- c(1.3, 1.2, 1.1, 1.05)
-LDend = matrix(rep(0, length(SDstart.vec) * length(R0vec)),
-               nrow = length(SDstart.vec),
-               ncol = length(R0vec))
-for (j in seq(1, length(R0vec))) {
-  R0 = R0vec[j]
-  beta <- uniroot(find.beta, c(0, 10), R0 = R0)$root
-  for (i in seq(1, length(SDstart.vec))) {
-    SDstart <- SDstart.vec[i]
-    # performing the numerical integration
-    out <-
-      ode(
-        y = yini,
-        parms = NULL,
-        times = times,
-        func = Miller.CT
-      )
-    out <- data.frame(out)
-    LDend[i, j] = out$time[max(which(out$IC * tot.popn > 1))] - SDstart
-  }
-}
-
-png(file = "lowR0.png",
-    width = 500,
-    height = 450)
-plot(
-  SDstart.vec,
-  LDend[, 1],
-  typ = "l",
-  ylab = "lockdown duration (days)",
-  xlab = "Days waited till lockdown start",
-  ylim = c(28, 38)
-)
-lines(SDstart.vec, LDend[, 2])
-lines(SDstart.vec, LDend[, 3])
-dev.off()
+# # Day 10 for the implementation of the higher alert level
+# SDstart <- 10
+# out <- ode(
+#   y = yini,
+#   parms = NULL,
+#   times = times,
+#   func = Miller.CT
+# )
+# out10 <- data.frame(out)
+# 
+# # Making the figure for escalation on day 7 or day 10
+# png(file = "reescalation.png",
+#     width = 1000,
+#     height = 450)
+# par(mfrow = c(1, 2), mar = c(5, 6, 3, 1))
+# # New daily cases is the derivative of cumulative cases
+# plot(
+#   tail(out7$time, -1),
+#   diff(out7$cumIC) * tot.popn,
+#   typ = "l",
+#   xlab = "days",
+#   ylab = "daily cases",
+#   xlim = c(0, 30),
+#   main = "Re-escalation on day 7",
+#   ylim = c(0, 15),
+#   bty = "n",
+#   lwd = 3,
+#   cex.lab = 2,
+#   cex.main = 2,
+#   cex.axis = 2
+# )
+# lines(c(7, 7), c(0, max(out7$IC * tot.popn)), lty = 2, lwd = 2)
+# plot(
+#   tail(out10$time, -1),
+#   diff(out10$cumIC * tot.popn),
+#   typ = "l",
+#   xlab = "days",
+#   ylab = "daily cases",
+#   xlim = c(0, 30),
+#   main = "Re-escalation on day 10",
+#   ylim = c(0, 15),
+#   bty = "n",
+#   lwd = 3,
+#   cex.lab = 2,
+#   cex.main = 2,
+#   cex.axis = 2
+# )
+# lines(c(10, 10), c(0, max(out10$IC * tot.popn)), lty = 2, lwd = 2)
+# dev.off()
+# 
+# # Loop across escalation days
+# SDstart.vec <- seq(0, 20, 1)
+# # Preallocate output vector
+# out.dat = data.frame("Estart" = NULL)
+# Estart = NULL
+# ICstart = NULL
+# Efinal = NULL
+# ICfinal = NULL
+# LDend = NULL
+# 
+# # The is a loop across different days that escalation could start
+# for (i in seq(1, length(SDstart.vec))) {
+#   SDstart <- SDstart.vec[i]
+#   # performing the numerical integration
+#   out <-
+#     ode(
+#       y = yini,
+#       parms = NULL,
+#       times = times,
+#       func = Miller.CT
+#     )
+#   out <- data.frame(out)
+#   # recording the number of exposed when re-escalation starts
+#   Estart[i] = out$E[which(out$time == SDstart)]
+#   # recording the number of clinically infected when re-escalation starts
+#   ICstart[i] = out$IC[which(out$time == SDstart)]
+#   # recording the number of exposed & clinically infected at the final time
+#   Efinal[i] = tail(out$cumE, 1)
+#   ICfinal[i] = tail(out$cumIC, 1)
+#   # the lockdown is assumed to end when the number of clinically infected
+#   # is < 1. The duration of the lockdown is the end time - the start time.
+#   LDend[i] = out$time[max(which(out$IC * tot.popn > 1))] - SDstart
+# }
+# 
+# # Figure code
+# png(file = "dontwait.png",
+#     width = 1000,
+#     height = 450)
+# par(mfrow = c(1, 2), mar = c(5, 6, 3, 1))
+# plot(
+#   SDstart.vec,
+#   tot.popn * ICfinal,
+#   ylab = "total clinical infections",
+#   xlab = "Days waited till re-escalation start",
+#   typ = "l",
+#   ylim = c(0, 3000),
+#   bty = "n",
+#   lwd = 3,
+#   cex.lab = 2,
+#   cex.main = 2,
+#   cex.axis = 2,
+#   main = "Delays are bad for public health"
+# )
+# plot(
+#   SDstart.vec,
+#   LDend,
+#   typ = "l",
+#   ylab = "Days at higher alert level",
+#   xlab = "Days waited till re-escalation start",
+#   bty = "n",
+#   lwd = 3,
+#   cex.lab = 2,
+#   cex.main = 2,
+#   cex.axis = 2,
+#   main = "Delays are bad for well-being"
+# )
+# dev.off()
+# L = length(SDstart)
+# mod = lm(LDend[5:L] ~ SDstart.vec[5:L])
+# # Slope is 0.41
+# 
+# # Below the code investigates different R0 values
+# R0vec <- c(1.3, 1.2, 1.1, 1.05)
+# LDend = matrix(rep(0, length(SDstart.vec) * length(R0vec)),
+#                nrow = length(SDstart.vec),
+#                ncol = length(R0vec))
+# for (j in seq(1, length(R0vec))) {
+#   R0 = R0vec[j]
+#   beta <- uniroot(find.beta, c(0, 10), R0 = R0)$root
+#   for (i in seq(1, length(SDstart.vec))) {
+#     SDstart <- SDstart.vec[i]
+#     # performing the numerical integration
+#     out <-
+#       ode(
+#         y = yini,
+#         parms = NULL,
+#         times = times,
+#         func = Miller.CT
+#       )
+#     out <- data.frame(out)
+#     LDend[i, j] = out$time[max(which(out$IC * tot.popn > 1))] - SDstart
+#   }
+# }
+# 
+# png(file = "lowR0.png",
+#     width = 500,
+#     height = 450)
+# plot(
+#   SDstart.vec,
+#   LDend[, 1],
+#   typ = "l",
+#   ylab = "lockdown duration (days)",
+#   xlab = "Days waited till lockdown start",
+#   ylim = c(28, 38)
+# )
+# lines(SDstart.vec, LDend[, 2])
+# lines(SDstart.vec, LDend[, 3])
+# dev.off()
 
 
 ## Are we keeping the following? If so, how are we using it?
@@ -479,6 +480,5 @@ dev.off()
 # lines(out$time, out$IC*tot.popn, typ = "l", col="blue")
 #
 # 
-
 
 
