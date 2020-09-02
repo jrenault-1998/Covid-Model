@@ -128,11 +128,11 @@ Miller.CT = function(t, y, parms) {
       #new to I_p
       + r * deltaE * model_matrix["E", i] 
       #getting contacted from when they were infected
-      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 1 / deltaE:(tau + 1 / deltaI_p - 1)) {
+      - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 1 / deltaE:(tau + 1 / deltaI_p)) {
         x <- 0
         x <- x + model_matrix["S", i - j]
         }
-        b_c * x)
+        b_c * (x - model_matrix["S", i - 1/deltaI_p]))
       #going to I_c
       - deltaI_p * model_matrix["I_p", i]
     
