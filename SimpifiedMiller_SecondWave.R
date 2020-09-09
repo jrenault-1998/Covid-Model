@@ -60,8 +60,7 @@ deltaS_q <- 1 / 2
 tau <- 1 / 2
 
 # Population size
-N <- 1000000000
-
+N <- 1
 
 
 # The following is a series adjusted for quarantining given contact tracing, adjusted using Miller et. al & Tang et. al
@@ -70,27 +69,27 @@ N <- 1000000000
 
 
 Miller.CT <- function(t, y) {
-  matrix_size <- t * 8
+  matrix_size <- (t+1) * 8
   
   #creating the matrix
-  model_matrix <- matrix(, ncol = 8, nrow = t)
-  colnames(model_matrix) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q")
+  CT <- matrix(, nrow = 8, ncol = t)
+  colnames(CT) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q")
   
-  model_matrix["S", 1]   = y[1]
-  model_matrix["E", 1]   = y[2]
-  model_matrix["I_p", 1] = y[3]
-  model_matrix["I_c", 1] = y[4]
-  model_matrix["I_a", 1] = y[5]
-  model_matrix["Q", 1]   = y[6]
-  model_matrix["Q_a", 1] = y[7]
-  model_matrix["S_q", 1] = y[8]
+  CT[1, "S"]   = y[1]
+  CT[1, "E"]   = y[2]
+  CT[1, "I_p"] = y[3]
+  CT[1, "I_c"] = y[4]
+  CT[1, "I_a"] = y[5]
+  CT[1, "Q"]   = y[6]
+  CT[1, "Q_a"] = y[7]
+  CT[1, "S_q"] = y[8]
   
-  for (i in 1:t - 1) {
+  for (i in 1:t ) {
     
-    
-    model_matrix["S", i + 1] =   model_matrix["S", i]
+
+    CT[i+1, "S"] =   CT[i, "S"]
     #got infected today
-    - model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + b_c * model_matrix["I_c", i] + b_a * model_matrix["I_a", i])
+    - CT[i, "S"] * beta * c * (model_matrix["I_p", i] + b_c * model_matrix["I_c", i] + b_a * model_matrix["I_a", i])
     #didn't get infected, still contacted
     - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * (1 - beta) * q * c * (for (j in 0:tau - 1) {
       x <- 0
