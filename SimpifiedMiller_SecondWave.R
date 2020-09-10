@@ -39,10 +39,10 @@ b_c <- 0.1
 deltaE <- 1 / 4
 
 # Mean time spent in Infected_Pre-Clinical
-deltaI_p <- 1 / 2.4
+deltaI_p <- 1 / 2
 
 # Mean time spent in Infected_Clinical
-deltaI_c <- 1 / 3.2
+deltaI_c <- 1 / 3
 
 # Mean time spent in Infected_Asymptomatic
 deltaI_a <- 1 / 7
@@ -57,7 +57,7 @@ deltaQ_a <- 1 / 2
 deltaS_q <- 1 / 2
 
 # Days for test results (Placeholder value)
-tau <- 1 / 2
+tau <- 2
 
 # Population size
 N <- 1
@@ -69,10 +69,10 @@ N <- 1
 
 
 Miller.CT <- function(t, y) {
-  matrix_size <- (t+1) * 8
+  CT_size <- (t+1) * 8
   
   #creating the matrix
-  CT <- matrix(, nrow = 8, ncol = t)
+  CT <- matrix(CT_size, nrow = t+1, ncol = 8)
   colnames(CT) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q")
   
   CT[1, "S"]   = y[1]
@@ -86,132 +86,76 @@ Miller.CT <- function(t, y) {
   
   for (i in 1:t ) {
     
-
     CT[i+1, "S"] =   CT[i, "S"]
     #got infected today
-    - CT[i, "S"] * beta * c * (model_matrix["I_p", i] + b_c * model_matrix["I_c", i] + b_a * model_matrix["I_a", i])
+    - CT[i, "S"] * beta * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"] + b_a * CT[i, "I_a"])/N
     #didn't get infected, still contacted
-    - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * (1 - beta) * q * c * (for (j in 0:tau - 1) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      b_c * x
-      } 
-      + for (j in tau:(tau + 1 / deltaI_p)) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      x
-      })
+    - CT[i, "S"] * q * (1-beta) * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
     #finished quarantine, never had it
-    + deltaS_q * model_matrix["S_q", i]
+    + deltaS_q * CT[i, "S_q"]
     
     
-    model_matrix["E", i + 1] =   model_matrix["E", i]
+    CT[i+1, "E"] =   CT[i, "E"]
     #got infected today
-    + model_matrix["S", i] * beta * c * (model_matrix["I_p", i] + b_c * model_matrix["I_c", i] + b_a * model_matrix["I_a", i])
+    + CT[i, "S"] * beta * c * ((1-q)*(CT[i, "I_p"] + b_c * CT[i, "I_c"]) + b_a * CT[i, "I_a"])/N
     #getting contacted from when they were infected
-    - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (for (j in 0:tau - 1) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      b_c * x
-      } 
-      + for (j in tau:(1 / deltaE - 1)) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      x
-      })
+    - CT[i, "E"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
     #going to I_p or I_a
-    - deltaE * model_matrix["E", i]
+    - deltaE * CT[i, "E"]
     
     
-    model_matrix["I_p", i + 1] =  model_matrix["I_p", i]
+    CT[i+1, "I_p"] =  CT[i, "I_p"]
     #new to I_p
-    + r * deltaE * model_matrix["E", i] 
+    + r * deltaE * CT[i, "E"]
     #getting contacted from when they were infected
-    - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 1 / deltaE:(tau + 1 / deltaI_p)) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      b_c * (x - model_matrix["S", i - 1/deltaI_p])
-      })
+    - CT[i, "I_p"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
     #going to I_c
-    - deltaI_p * model_matrix["I_p", i]
+    - deltaI_p * CT[i, "I_p"]
     
     
-    model_matrix["I_c", i + 1] =  model_matrix["I_c", i]
+    CT[i+1, "I_c"] =  CT[i, "I_c"]
     #from I_p
-    + deltaI_p * model_matrix["I_p", i]
-    #went to Q not I_c
-    - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * b_c * model_matrix["S", i - (tau + 1 / deltaI_p)]
+    + deltaI_p * CT[i, "I_p"]
     #from Q
-    + deltaQ * model_matrix["Q", i]
+    + deltaQ * CT[i, "Q"]
     #recovering
-    - deltaI_c * model_matrix["I_c", i]
+    - deltaI_c * CT[i, "I_c"]
     
     
-    model_matrix["I_a", i + 1] =  model_matrix["I_a", i]
+    CT[i+1, "I_a"] =  CT[i, "I_a"]
     #new to I_a
-    + (1 - r) * deltaE * model_matrix["E", i]  
+    + (1-r) * deltaE * CT[i, "E"]  
     #getting contacted from when they were infected
-    - r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 1 / deltaE:(tau + 1 / deltaI_p)) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      b_c * x
-      })
+    - CT[i, "I_a"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
     #recovering
-    - deltaI_a * model_matrix["I_a", i]
+    - deltaI_a * CT[i, "I_a"]
     
     
-    model_matrix["Q", i + 1] = model_matrix["Q", i + 1]
+    CT[i+1, "Q"] =  CT[i, "Q"]
     #quarantined by cantact tracing
-    + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * r * (for (j in 0:tau - 1) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      b_c * x
-      }
-      + for (j in tau:tau + 1/deltaI_p) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      x
-      })
+    + (r * CT[i, "E"] + CT[i, "I_p"] + beta * r * CT[i, "S"]) * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
     #left due to (+ve) COVID test
-    - deltaQ * model_matrix["Q", i]
+    - deltaQ * CT[i, "Q"]
     
     
-    model_matrix["Q_a", i + 1] = model_matrix["Q_a", i + 1]
+    CT[i+1, "Q_a"] =  CT[i, "Q_a"]
     #quarantined by cantact tracing
-    + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * beta * (1 - r) * (for (j in 0:tau - 1) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      b_c * x
-      }
-      + for (j in tau:tau + 1/deltaI_p) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      x
-      })
+    + ((1 - r) * CT[i, "E"] + CT[i, "I_a"] + beta * (1 - r) * CT[i, "S"]) * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
     #finished quarantine
-    -deltaQ_a * model_matrix["Q_a", i]
+    -deltaQ_a * CT[i, "Q_a"]
     
     
-    model_matrix["S_q", i + 1] = model_matrix["Q_a", i + 1]
+    CT[i+1, "S_q"] =  CT[i, "S_q"]
     #quarantined by cantact tracing
-    + r * deltaE * model_matrix["E", i - (tau + 1 / deltaI_p)] * q * c * (1 - beta) * (for (j in 0:tau - 1) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      b_c * x
-      }
-      + for (j in tau:tau + 1/deltaI_p) {
-      x <- 0
-      x <- x + model_matrix["S", i - j]
-      x
-      })
+    + CT[i, "S"] * q * (1-beta) * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
     #finished quarantine
-    - deltaS_q * model_matrix["S_q", i]
-    
+    - deltaS_q * CT[i, "S_q"]
   }
+  ## The matrix CT is gone???
 }
 
 # Assumed the epidemic begins with 3 exposed.
-E0 = 3
+E0 = 10^(-7)
 
 yini  = c(
   S = (N - E0),
@@ -479,5 +423,3 @@ yini  = c(
 # lines(out$time, out$IC*tot.popn, typ = "l", col="blue")
 #
 # 
-
-
