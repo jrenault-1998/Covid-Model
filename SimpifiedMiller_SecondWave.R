@@ -19,12 +19,12 @@ library(curl)
 
 # Prob. transmission given contact (Placeholder value)
 beta <- 1
-
+t<-20
 # Contact rate (Placeholder value)
 c <- 1
 
 # Prob. E -> I_p given leaving E (Placeholder value)
-r <- 1
+r <- 0.5
 
 # Contact tracing effectiveness rate (Placeholder value)
 q <- 1
@@ -62,102 +62,10 @@ tau <- 2
 # Population size
 N <- 1
 
-
-# The following is a series adjusted for quarantining given contact tracing, adjusted using Miller et. al & Tang et. al
-
-## The following has only been partially updated (Not entirely sure options out of Q)
-
-
-Miller.CT <- function(t, y) {
-  CT_size <- (t+1) * 8
-  
-  #creating the matrix
-  CT <- matrix(CT_size, nrow = t+1, ncol = 8)
-  colnames(CT) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q")
-  
-  CT[1, "S"]   = y[1]
-  CT[1, "E"]   = y[2]
-  CT[1, "I_p"] = y[3]
-  CT[1, "I_c"] = y[4]
-  CT[1, "I_a"] = y[5]
-  CT[1, "Q"]   = y[6]
-  CT[1, "Q_a"] = y[7]
-  CT[1, "S_q"] = y[8]
-  
-  for (i in 1:t ) {
-    
-    CT[i+1, "S"] =   CT[i, "S"]
-    #got infected today
-    - CT[i, "S"] * beta * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"] + b_a * CT[i, "I_a"])/N
-    #didn't get infected, still contacted
-    - CT[i, "S"] * q * (1-beta) * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
-    #finished quarantine, never had it
-    + deltaS_q * CT[i, "S_q"]
-    
-    
-    CT[i+1, "E"] =   CT[i, "E"]
-    #got infected today
-    + CT[i, "S"] * beta * c * ((1-q)*(CT[i, "I_p"] + b_c * CT[i, "I_c"]) + b_a * CT[i, "I_a"])/N
-    #getting contacted from when they were infected
-    - CT[i, "E"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
-    #going to I_p or I_a
-    - deltaE * CT[i, "E"]
-    
-    
-    CT[i+1, "I_p"] =  CT[i, "I_p"]
-    #new to I_p
-    + r * deltaE * CT[i, "E"]
-    #getting contacted from when they were infected
-    - CT[i, "I_p"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
-    #going to I_c
-    - deltaI_p * CT[i, "I_p"]
-    
-    
-    CT[i+1, "I_c"] =  CT[i, "I_c"]
-    #from I_p
-    + deltaI_p * CT[i, "I_p"]
-    #from Q
-    + deltaQ * CT[i, "Q"]
-    #recovering
-    - deltaI_c * CT[i, "I_c"]
-    
-    
-    CT[i+1, "I_a"] =  CT[i, "I_a"]
-    #new to I_a
-    + (1-r) * deltaE * CT[i, "E"]  
-    #getting contacted from when they were infected
-    - CT[i, "I_a"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
-    #recovering
-    - deltaI_a * CT[i, "I_a"]
-    
-    
-    CT[i+1, "Q"] =  CT[i, "Q"]
-    #quarantined by cantact tracing
-    + (r * CT[i, "E"] + CT[i, "I_p"] + beta * r * CT[i, "S"]) * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
-    #left due to (+ve) COVID test
-    - deltaQ * CT[i, "Q"]
-    
-    
-    CT[i+1, "Q_a"] =  CT[i, "Q_a"]
-    #quarantined by cantact tracing
-    + ((1 - r) * CT[i, "E"] + CT[i, "I_a"] + beta * (1 - r) * CT[i, "S"]) * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
-    #finished quarantine
-    -deltaQ_a * CT[i, "Q_a"]
-    
-    
-    CT[i+1, "S_q"] =  CT[i, "S_q"]
-    #quarantined by cantact tracing
-    + CT[i, "S"] * q * (1-beta) * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N
-    #finished quarantine
-    - deltaS_q * CT[i, "S_q"]
-  }
-  ## The matrix CT is gone???
-}
-
 # Assumed the epidemic begins with 3 exposed.
 E0 = 10^(-7)
 
-yini  = c(
+y  = c(
   S = (N - E0),
   E = E0,
   I_p = 0,
@@ -167,12 +75,67 @@ yini  = c(
   Q_a = 0,
   S_q = 0
 )
+
+# The following is a series adjusted for quarantining given contact tracing, adjusted using Miller et. al & Tang et. al
+
+## The following has only been partially updated (Not entirely sure options out of Q)
+
+# for(t in seq(1,4,1)){
+#   val <- N0*lambda^t
+#   new.result <- data.frame(time = t, popn.size = val)
+#   df <- rbind(df, new.result)
+# }
+
+  CT_size <- (t+1) * 8
+
+  #creating the matrix
+  CT <- matrix(CT_size, nrow = t+1, ncol = 8)
+  colnames(CT) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q")
+
+  CT[1, "S"]   = y[1]
+  CT[1, "E"]   = y[2]
+  CT[1, "I_p"] = y[3]
+  CT[1, "I_c"] = y[4]
+  CT[1, "I_a"] = y[5]
+  CT[1, "Q"]   = y[6]
+  CT[1, "Q_a"] = y[7]
+  CT[1, "S_q"] = y[8]
+
+  for (i in seq(1,t) ) {
+# S = CT[i,"S"]
+    CT[i+1, "S"] =   CT[i, "S"]- CT[i, "S"] * beta * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"] + b_a * CT[i, "I_a"])/N- CT[i, "S"] * q * (1-beta) * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N+ deltaS_q * CT[i, "S_q"]
+
+
+    CT[i+1, "E"] =   CT[i, "E"] + CT[i, "S"] * beta * c * ((1-q)*(CT[i, "I_p"] + b_c * CT[i, "I_c"]) + b_a * CT[i, "I_a"])/N- CT[i, "E"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N- deltaE * CT[i, "E"]
+
+
+    CT[i+1, "I_p"] =  CT[i, "I_p"]+ r * deltaE * CT[i, "E"]- CT[i, "I_p"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N- deltaI_p * CT[i, "I_p"]
+
+
+    CT[i+1, "I_c"] =  CT[i, "I_c"]+ deltaI_p * CT[i, "I_p"]+ deltaQ * CT[i, "Q"]- deltaI_c * CT[i, "I_c"]
+
+
+    CT[i+1, "I_a"] =  CT[i, "I_a"]+ (1-r) * deltaE * CT[i, "E"]- CT[i, "I_a"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N- deltaI_a * CT[i, "I_a"]
+
+
+    CT[i+1, "Q"] =  CT[i, "Q"]+ (r * CT[i, "E"] + CT[i, "I_p"] + beta * r * CT[i, "S"]) * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N- deltaQ * CT[i, "Q"]
+
+
+    CT[i+1, "Q_a"] =  CT[i, "Q_a"]+ ((1 - r) * CT[i, "E"] + CT[i, "I_a"] + beta * (1 - r) * CT[i, "S"]) * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N-deltaQ_a * CT[i, "Q_a"]
+
+
+    CT[i+1, "S_q"] =  CT[i, "S_q"]+ CT[i, "S"] * q * (1-beta) * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N- deltaS_q * CT[i, "S_q"]
+  }
+
+plot(0:t-1, CT[,"S"], typ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
+lines(0:t-1, CT[,"E"], col = "orange")
+
 # # the times for the numerical integration
 # times <- seq(0, 365, by = .1)
 # # The assumed R0 prior to the higher alert level
 # R0 <- 2.5
 # beta <- uniroot(find.beta, c(0, 10), R0 = R0)$root
-# 
+#
 # # Day 7 for the implementation of the higher alert level
 # SDstart <- 7
 # out <- ode(
@@ -192,7 +155,7 @@ yini  = c(
 #   func = Miller.CT
 # )
 # out10 <- data.frame(out)
-# 
+#
 # # Making the figure for escalation on day 7 or day 10
 # png(file = "reescalation.png",
 #     width = 1000,
@@ -232,7 +195,7 @@ yini  = c(
 # )
 # lines(c(10, 10), c(0, max(out10$IC * tot.popn)), lty = 2, lwd = 2)
 # dev.off()
-# 
+#
 # # Loop across escalation days
 # SDstart.vec <- seq(0, 20, 1)
 # # Preallocate output vector
@@ -242,7 +205,7 @@ yini  = c(
 # Efinal = NULL
 # ICfinal = NULL
 # LDend = NULL
-# 
+#
 # # The is a loop across different days that escalation could start
 # for (i in seq(1, length(SDstart.vec))) {
 #   SDstart <- SDstart.vec[i]
@@ -266,7 +229,7 @@ yini  = c(
 #   # is < 1. The duration of the lockdown is the end time - the start time.
 #   LDend[i] = out$time[max(which(out$IC * tot.popn > 1))] - SDstart
 # }
-# 
+#
 # # Figure code
 # png(file = "dontwait.png",
 #     width = 1000,
@@ -303,7 +266,7 @@ yini  = c(
 # L = length(SDstart)
 # mod = lm(LDend[5:L] ~ SDstart.vec[5:L])
 # # Slope is 0.41
-# 
+#
 # # Below the code investigates different R0 values
 # R0vec <- c(1.3, 1.2, 1.1, 1.05)
 # LDend = matrix(rep(0, length(SDstart.vec) * length(R0vec)),
@@ -326,7 +289,7 @@ yini  = c(
 #     LDend[i, j] = out$time[max(which(out$IC * tot.popn > 1))] - SDstart
 #   }
 # }
-# 
+#
 # png(file = "lowR0.png",
 #     width = 500,
 #     height = 450)
@@ -422,4 +385,4 @@ yini  = c(
 # out <- data.frame(out)
 # lines(out$time, out$IC*tot.popn, typ = "l", col="blue")
 #
-# 
+#
