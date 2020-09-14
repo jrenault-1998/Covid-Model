@@ -17,17 +17,25 @@ library(curl)
 
 # Parameters as proposed for the new model
 
-# Prob. transmission given contact (Placeholder value)
-beta <- 1
-t<-20
-# Contact rate (Placeholder value)
-c <- 1
+# Prob. transmission given contact 
+beta <- 0.2068
 
-# Prob. E -> I_p given leaving E (Placeholder value)
-r <- 0.5
+#
 
-# Contact tracing effectiveness rate (Placeholder value)
-q <- 1
+# Days the model runs
+t <- 350
+
+# Days for test results 
+tau <- 2
+
+# Contact rate
+c <- 14.781
+
+# Prob. E -> I_p given leaving E 
+r <- 0.9
+
+# Contact tracing effectiveness rate 
+q <- 0.9
 
 # Decrease in asymptomatic infectivity
 b_a <- 0.5
@@ -39,31 +47,28 @@ b_c <- 0.1
 deltaE <- 1 / 4
 
 # Mean time spent in Infected_Pre-Clinical
-deltaI_p <- 1 / 2
+deltaI_p <- 1 / 2.4
 
 # Mean time spent in Infected_Clinical
-deltaI_c <- 1 / 3
+deltaI_c <- 1 / 3.2
 
 # Mean time spent in Infected_Asymptomatic
 deltaI_a <- 1 / 7
 
-# Mean time spent in Q (Placeholder value)
-deltaQ <- 1 / 2
+# Mean time spent in Q
+deltaQ <- 1 / ((1/deltaE + 1/deltaI_p)/2 + tau)
 
-# Mean time spent in Q_a (Placeholder value)
-deltaQ_a <- 1 / 2
+# Mean time spent in Q_a
+deltaQ_a <- 1 / 14
 
-# Mean time spent in S_q (Placeholder value)
-deltaS_q <- 1 / 2
+# Mean time spent in S_q 
+deltaS_q <- 1 / 14
 
-# Days for test results (Placeholder value)
-tau <- 2
-
-# Population size
+# Initial Population size
 N <- 1
 
-# Assumed the epidemic begins with 3 exposed.
-E0 = 10^(-7)
+# Assumed the epidemic begins with 0.0001% of population exposed
+E0 = 10^(-6)   
 
 y  = c(
   S = (N - E0),
@@ -86,49 +91,71 @@ y  = c(
 #   df <- rbind(df, new.result)
 # }
 
-  CT_size <- (t+1) * 8
+CT_size <- (t+1) * 8
 
-  #creating the matrix
-  CT <- matrix(CT_size, nrow = t+1, ncol = 8)
-  colnames(CT) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q")
+#creating the matrix
+CT <- matrix(CT_size, nrow = t+1, ncol = 8)
+colnames(CT) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q")
 
-  CT[1, "S"]   = y[1]
-  CT[1, "E"]   = y[2]
-  CT[1, "I_p"] = y[3]
-  CT[1, "I_c"] = y[4]
-  CT[1, "I_a"] = y[5]
-  CT[1, "Q"]   = y[6]
-  CT[1, "Q_a"] = y[7]
-  CT[1, "S_q"] = y[8]
+CT[1, "S"]   = y[1]
+CT[1, "E"]   = y[2]
+CT[1, "I_p"] = y[3]
+CT[1, "I_c"] = y[4]
+CT[1, "I_a"] = y[5]
+CT[1, "Q"]   = y[6]
+CT[1, "Q_a"] = y[7]
+CT[1, "S_q"] = y[8]
 
-  for (i in seq(1,t) ) {
-# S = CT[i,"S"]
-    CT[i+1, "S"] =   CT[i, "S"]- CT[i, "S"] * beta * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"] + b_a * CT[i, "I_a"])/N- CT[i, "S"] * q * (1-beta) * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N+ deltaS_q * CT[i, "S_q"]
-
-
-    CT[i+1, "E"] =   CT[i, "E"] + CT[i, "S"] * beta * c * ((1-q)*(CT[i, "I_p"] + b_c * CT[i, "I_c"]) + b_a * CT[i, "I_a"])/N- CT[i, "E"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N- deltaE * CT[i, "E"]
-
-
-    CT[i+1, "I_p"] =  CT[i, "I_p"]+ r * deltaE * CT[i, "E"]- CT[i, "I_p"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N- deltaI_p * CT[i, "I_p"]
-
-
-    CT[i+1, "I_c"] =  CT[i, "I_c"]+ deltaI_p * CT[i, "I_p"]+ deltaQ * CT[i, "Q"]- deltaI_c * CT[i, "I_c"]
-
-
-    CT[i+1, "I_a"] =  CT[i, "I_a"]+ (1-r) * deltaE * CT[i, "E"]- CT[i, "I_a"] * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N- deltaI_a * CT[i, "I_a"]
-
-
-    CT[i+1, "Q"] =  CT[i, "Q"]+ (r * CT[i, "E"] + CT[i, "I_p"] + beta * r * CT[i, "S"]) * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N- deltaQ * CT[i, "Q"]
-
-
-    CT[i+1, "Q_a"] =  CT[i, "Q_a"]+ ((1 - r) * CT[i, "E"] + CT[i, "I_a"] + beta * (1 - r) * CT[i, "S"]) * c * q * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N-deltaQ_a * CT[i, "Q_a"]
-
-
-    CT[i+1, "S_q"] =  CT[i, "S_q"]+ CT[i, "S"] * q * (1-beta) * c * (CT[i, "I_p"] + b_c * CT[i, "I_c"])/N- deltaS_q * CT[i, "S_q"]
-  }
+for (i in seq(1,t) ) {
+  S   = CT[i,"S"]
+  E   = CT[i,"E"]
+  I_p = CT[i,"I_p"]
+  I_c = CT[i,"I_c"]
+  I_a = CT[i,"I_a"]
+  Q   = CT[i,"Q"]
+  Q_a = CT[i,"Q_a"]
+  S_q = CT[i,"S_q"]
+  N   = S + E + I_p + I_c + I_a + Q + Q_a + S_q
+  
+  CT[i+1, "S"] =   S - S * beta * c * (I_p + b_c * I_c + b_a * I_a)/N- S * q * (1-beta) * c * (I_p + b_c * I_c)/N + deltaS_q * S_q
+  
+  
+  CT[i+1, "E"] =   E + S * beta * c * ((1-q)*(I_p + b_c * I_c) + b_a * I_a)/N- E * c * q * (I_p + b_c * I_c)/N- deltaE * E
+  
+  
+  CT[i+1, "I_p"] =  I_p+ r * deltaE * E- I_p * c * q * (I_p + b_c * I_c)/N- deltaI_p * I_p
+  
+  
+  CT[i+1, "I_c"] =  I_c+ deltaI_p * I_p+ deltaQ * Q- deltaI_c * I_c
+  
+  
+  CT[i+1, "I_a"] =  I_a+ (1-r) * deltaE * E- I_a * c * q * (I_p + b_c * I_c)/N- deltaI_a * I_a
+  
+  
+  CT[i+1, "Q"] =  Q+ (r * E + I_p + beta * r * S) * c * q * (I_p + b_c * I_c)/N- deltaQ * Q
+  
+  
+  CT[i+1, "Q_a"] =  Q_a+ ((1 - r) * E + I_a + beta * (1 - r) * S) * c * q * (I_p + b_c * I_c)/N-deltaQ_a * Q_a
+  
+  
+  CT[i+1, "S_q"] =  S_q + S * q * (1-beta) * c * (I_p + b_c * I_c)/N- deltaS_q * S_q
+}
 
 plot(0:t-1, CT[,"S"], typ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
 lines(0:t-1, CT[,"E"], col = "orange")
+
+lines(0:t-1, CT[,"I_p"], col = "red")
+
+lines(0:t-1, CT[,"I_c"], col = "purple")
+
+lines(0:t-1, CT[,"I_a"], col = "green")
+
+lines(0:t-1, CT[,"Q"], col = "yellow")
+
+lines(0:t-1, CT[,"Q_a"], col = "brown")
+
+lines(0:t-1, CT[,"S_q"], col = "blue")
+
 
 # # the times for the numerical integration
 # times <- seq(0, 365, by = .1)
