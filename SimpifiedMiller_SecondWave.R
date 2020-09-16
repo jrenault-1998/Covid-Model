@@ -141,20 +141,41 @@ for (i in seq(1,t) ) {
   CT[i+1, "S_q"] =  S_q + S * q * (1-beta) * c * (I_p + b_c * I_c)/N- deltaS_q * S_q
 }
 
-plot(0:t-1, CT[,"S"], typ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
-lines(0:t-1, CT[,"E"], col = "orange")
+# Just a few modifications to make the code more easier to read
+df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"], 
+                 "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"])
 
-lines(0:t-1, CT[,"I_p"], col = "red")
+ plot(0:t, df$S, type ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
+ 
+ lines(0:t, df$E, col = "orange")
+ 
+ lines(0:t, df$I_p, col = "red")
+ 
+ lines(0:t, df$I_c, col = "purple")
+ 
+ lines(0:t, df$I_a, col = "green")
+ 
+ lines(0:t, df$Q, col = "yellow")
+ 
+ lines(0:t, df$Q_a, col = "brown")
+ 
+ lines(0:t, df$S_q, col = "blue")
 
-lines(0:t-1, CT[,"I_c"], col = "purple")
+# plot(0:t-1, CT[,"S"], type ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
+# lines(0:t-1, CT[,"E"], col = "orange")
+# 
+# lines(0:t-1, CT[,"I_p"], col = "red")
+# 
+# lines(0:t-1, CT[,"I_c"], col = "purple")
+# 
+# lines(0:t-1, CT[,"I_a"], col = "green")
+# 
+# lines(0:t-1, CT[,"Q"], col = "yellow")
+# 
+# lines(0:t-1, CT[,"Q_a"], col = "brown")
+# 
+# lines(0:t-1, CT[,"S_q"], col = "blue")
 
-lines(0:t-1, CT[,"I_a"], col = "green")
-
-lines(0:t-1, CT[,"Q"], col = "yellow")
-
-lines(0:t-1, CT[,"Q_a"], col = "brown")
-
-lines(0:t-1, CT[,"S_q"], col = "blue")
 
 
 # # the times for the numerical integration
