@@ -18,7 +18,7 @@ library(curl)
 # Parameters as proposed for the new model
 
 # Prob. transmission given contact 
-beta <- 0.1068
+beta <- 0.2068
 
 #
 
