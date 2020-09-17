@@ -18,18 +18,18 @@ library(curl)
 # Parameters as proposed for the new model
 
 # Prob. transmission given contact 
-beta <- 0.2068
+beta <- 0.1068
 
 #
 
 # Days the model runs
-t <- 350
+t <- 200
 
 # Days for test results 
 tau <- 2
 
 # Contact rate
-c <- 14.781
+c <- 30
 
 # Prob. E -> I_p given leaving E 
 r <- 0.9
@@ -68,7 +68,7 @@ deltaS_q <- 1 / 14
 N <- 1
 
 # Assumed the epidemic begins with 0.0001% of population exposed
-E0 = 10^(-6)   
+E0 = 10^(-4)   
 
 y  = c(
   S = (N - E0),
@@ -145,7 +145,7 @@ for (i in seq(1,t) ) {
 df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"], 
                  "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"])
 
- plot(0:t, df$S, type ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
+ plot(0:t, df$S, type ="l", col = "black", ylim = c(0, 1), ylab = "size", xlab = "time")
  
  lines(0:t, df$E, col = "orange")
  
@@ -161,6 +161,10 @@ df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = C
  
  lines(0:t, df$S_q, col = "blue")
 
+ legend( "topright", c("E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q"), 
+         text.col=c("orange", "red", "purple", "green", "yellow", "brown", "blue") )
+
+ 
 # plot(0:t-1, CT[,"S"], type ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
 # lines(0:t-1, CT[,"E"], col = "orange")
 # 
