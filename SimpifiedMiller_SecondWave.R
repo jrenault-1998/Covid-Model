@@ -18,7 +18,7 @@ library(curl)
 # Parameters as proposed for the new model
 
 # Prob. transmission given contact 
-beta <- 0.2068
+alpha <- 0.2068
 
 #
 
@@ -47,10 +47,10 @@ b_c <- 0.1
 deltaE <- 1 / 4
 
 # Mean time spent in Infected_Pre-Clinical
-deltaI_p <- 1 / 2.4
+deltaI_p <- 1 / 2
 
 # Mean time spent in Infected_Clinical
-deltaI_c <- 1 / 3.2
+deltaI_c <- 1 / 3
 
 # Mean time spent in Infected_Asymptomatic
 deltaI_a <- 1 / 7
@@ -78,7 +78,8 @@ y  = c(
   I_a = 0,
   Q = 0,
   Q_a = 0,
-  S_q = 0
+  S_q = 0,
+  R = 0
 )
 
 # The following is a series adjusted for quarantining given contact tracing, adjusted using Miller et. al & Tang et. al
@@ -94,77 +95,87 @@ y  = c(
 CT_size <- (t+1) * 8
 
 #creating the matrix
-CT <- matrix(CT_size, nrow = t+1, ncol = 8)
-colnames(CT) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q")
+CT <- matrix(0, nrow = t+1, ncol = 9)
+colnames(CT) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q", "R")
 
-CT[1, "S"]   = y[1]
-CT[1, "E"]   = y[2]
-CT[1, "I_p"] = y[3]
-CT[1, "I_c"] = y[4]
-CT[1, "I_a"] = y[5]
-CT[1, "Q"]   = y[6]
-CT[1, "Q_a"] = y[7]
-CT[1, "S_q"] = y[8]
+CT[4, "S"]   = y[1]
+CT[4, "E"]   = y[2]
+CT[4, "I_p"] = y[3]
+CT[4, "I_c"] = y[4]
+CT[4, "I_a"] = y[5]
+CT[4, "Q"]   = y[6]
+CT[4, "Q_a"] = y[7]
+CT[4, "S_q"] = y[8]
+CT[4, "R"]   = y[9]
 
-for (i in seq(1,t) ) {
+for (i in seq(5,t) ) {
   S   = CT[i,"S"]
+  S1  = CT[i-1,"S"]
+  S2  = CT[i-2,"S"]
+  S3  = CT[i-3,"S"]
   E   = CT[i,"E"]
+  E4  = CT[i-4,"E"]
   I_p = CT[i,"I_p"]
   I_c = CT[i,"I_c"]
   I_a = CT[i,"I_a"]
   Q   = CT[i,"Q"]
   Q_a = CT[i,"Q_a"]
   S_q = CT[i,"S_q"]
-  N   = S + E + I_p + I_c + I_a + Q + Q_a + S_q
+  R   = CT[i, "R"]
+  N   = S + E + I_p + I_c + I_a + Q + Q_a + S_q + R
   
-  CT[i+1, "S"] =   S - S * beta * c * (I_p + b_c * I_c + b_a * I_a)/N- S * q * (1-beta) * c * (I_p + b_c * I_c)/N + deltaS_q * S_q
-  
-  
-  CT[i+1, "E"] =   E + S * beta * c * ((1-q)*(I_p + b_c * I_c) + b_a * I_a)/N- E * c * q * (I_p + b_c * I_c)/N- deltaE * E
+  CT[i+1, "S"] =   S - S * alpha * c * (I_p + b_c * I_c + b_a * I_a)/N- (E4*r*deltaE) * q * (1-alpha) * c * (b_c*(S+S1)+(S2+S3))/N + deltaS_q * S_q
   
   
-  CT[i+1, "I_p"] =  I_p+ r * deltaE * E- I_p * c * q * (I_p + b_c * I_c)/N- deltaI_p * I_p
+  CT[i+1, "E"] =   E + S * alpha * c * (I_p + b_c * I_c + b_a * I_a)/N- (E4*r*deltaE) * c * q * alpha * (b_c*(S+S1)+(S2+S3))/N- deltaE * E
+  
+  
+  CT[i+1, "I_p"] =  I_p+ r * deltaE * E - deltaI_p * I_p
   
   
   CT[i+1, "I_c"] =  I_c+ deltaI_p * I_p+ deltaQ * Q- deltaI_c * I_c
   
   
-  CT[i+1, "I_a"] =  I_a+ (1-r) * deltaE * E- I_a * c * q * (I_p + b_c * I_c)/N- deltaI_a * I_a
+  CT[i+1, "I_a"] =  I_a+ (1-r) * deltaE * E- deltaI_a * I_a
   
   
-  CT[i+1, "Q"] =  Q+ (r * E + I_p + beta * r * S) * c * q * (I_p + b_c * I_c)/N- deltaQ * Q
+  CT[i+1, "Q"] =  Q+ (E4*r*deltaE) * c * q * alpha * r * (b_c*(S+S1)+(S2+S3))/N- deltaQ * Q
   
   
-  CT[i+1, "Q_a"] =  Q_a+ ((1 - r) * E + I_a + beta * (1 - r) * S) * c * q * (I_p + b_c * I_c)/N-deltaQ_a * Q_a
+  CT[i+1, "Q_a"] =  Q_a+ (E4*r*deltaE) * c * q * alpha * (1-r) * (b_c*(S+S1)+(S2+S3))/N-deltaQ_a * Q_a
   
   
-  CT[i+1, "S_q"] =  S_q + S * q * (1-beta) * c * (I_p + b_c * I_c)/N- deltaS_q * S_q
+  CT[i+1, "S_q"] =  S_q + (E4*r*deltaE) * q * (1-alpha) * c * (b_c*(S+S1)+(S2+S3))/N - deltaS_q * S_q
+  
+  CT[i+1, "R"] =  R + deltaI_c * I_c + deltaQ_a * Q_a + deltaI_a * I_a
 }
 
 # Just a few modifications to make the code more easier to read
 df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"], 
-                 "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"])
+                 "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"], "R" = CT[, "R"])
 
- plot(0:t, df$S, type ="l", col = "black", ylim = c(0, 1), ylab = "size", xlab = "time")
- 
- lines(0:t, df$E, col = "orange")
- 
- lines(0:t, df$I_p, col = "red")
- 
- lines(0:t, df$I_c, col = "purple")
- 
- lines(0:t, df$I_a, col = "green")
- 
- lines(0:t, df$Q, col = "yellow")
- 
- lines(0:t, df$Q_a, col = "brown")
- 
- lines(0:t, df$S_q, col = "blue")
+plot(0:t, df$S, type ="l", col = "black", ylim = c(0, 1), ylab = "size", xlab = "time")
 
- legend( "topright", c("E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q"), 
-         text.col=c("orange", "red", "purple", "green", "yellow", "brown", "blue") )
+lines(0:t, df$E, col = "orange")
 
- 
+lines(0:t, df$I_p, col = "red")
+
+lines(0:t, df$I_c, col = "purple")
+
+lines(0:t, df$I_a, col = "green")
+
+lines(0:t, df$Q, col = "yellow")
+
+lines(0:t, df$Q_a, col = "brown")
+
+lines(0:t, df$S_q, col = "blue")
+
+lines(0:t, df$R, col = "pink")
+
+legend( "topright", c("E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q", "R"), 
+        text.col=c("orange", "red", "purple", "green", "yellow", "brown", "blue", "pink") )
+
+
 # plot(0:t-1, CT[,"S"], type ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
 # lines(0:t-1, CT[,"E"], col = "orange")
 # 
@@ -186,7 +197,7 @@ df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = C
 # times <- seq(0, 365, by = .1)
 # # The assumed R0 prior to the higher alert level
 # R0 <- 2.5
-# beta <- uniroot(find.beta, c(0, 10), R0 = R0)$root
+# alpha <- uniroot(find.alpha, c(0, 10), R0 = R0)$root
 #
 # # Day 7 for the implementation of the higher alert level
 # SDstart <- 7
@@ -326,7 +337,7 @@ df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = C
 #                ncol = length(R0vec))
 # for (j in seq(1, length(R0vec))) {
 #   R0 = R0vec[j]
-#   beta <- uniroot(find.beta, c(0, 10), R0 = R0)$root
+#   alpha <- uniroot(find.alpha, c(0, 10), R0 = R0)$root
 #   for (i in seq(1, length(SDstart.vec))) {
 #     SDstart <- SDstart.vec[i]
 #     # performing the numerical integration
@@ -382,12 +393,12 @@ df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = C
 #   RS <- y[6]
 #   RA <- y[7]
 #   cumIC <-y[8]
-#   dS = -S*beta.fun(t)*(IP+bC*IC+bA*IA)/N
-#   if(tau.fun(t)+S*beta.fun(t)*(IP+bC*IC+bA*IA)/N <= Lmax(t)){
+#   dS = -S*alpha.fun(t)*(IP+bC*IC+bA*IA)/N
+#   if(tau.fun(t)+S*alpha.fun(t)*(IP+bC*IC+bA*IA)/N <= Lmax(t)){
 #     # Take everyone who would have been in E and put them in Q
 #     dE = -deltaE*E
 #   } else {
-#     dE = (tau.fun(t)+S*beta.fun(t)*(IP+bC*IC+bA*IA)/N)*((tau.fun(t)+S*beta.fun(t)*(IP+bC*IC+bA*IA)/N)-Lmax(t))/(tau.fun(t)+S*beta.fun(t)*(IP+bC*IC+bA*IA)/N)-deltaE*E
+#     dE = (tau.fun(t)+S*alpha.fun(t)*(IP+bC*IC+bA*IA)/N)*((tau.fun(t)+S*alpha.fun(t)*(IP+bC*IC+bA*IA)/N)-Lmax(t))/(tau.fun(t)+S*alpha.fun(t)*(IP+bC*IC+bA*IA)/N)-deltaE*E
 #   }
 #   dIP = r*deltaE*E-deltaP*IP
 #   dIC = deltaP*IP-deltaC*IC
@@ -402,7 +413,7 @@ df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = C
 
 #
 # R0=2
-# beta<-uniroot(find.beta,c(0,10),R0=R0)$root
+# alpha<-uniroot(find.alpha,c(0,10),R0=R0)$root
 # SDStart<-10
 #
 # t.on <- 1
