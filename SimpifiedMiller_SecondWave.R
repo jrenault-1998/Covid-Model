@@ -29,7 +29,7 @@ t <- 200
 tau <- 2
 
 # Contact rate
-c <- 30
+c <- 8
 
 # Prob. E -> I_p given leaving E 
 r <- 0.9
@@ -97,16 +97,19 @@ CT_size <- (t+1) * 8
 #creating the matrix
 CT <- matrix(0, nrow = t+1, ncol = 9)
 colnames(CT) <- c("S", "E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q", "R")
-
-CT[4, "S"]   = y[1]
-CT[4, "E"]   = y[2]
-CT[4, "I_p"] = y[3]
-CT[4, "I_c"] = y[4]
-CT[4, "I_a"] = y[5]
-CT[4, "Q"]   = y[6]
-CT[4, "Q_a"] = y[7]
-CT[4, "S_q"] = y[8]
-CT[4, "R"]   = y[9]
+CT[1, "S"] = N
+CT[2, "S"] = N
+CT[3, "S"] = N
+CT[4, "S"] = N
+CT[5, "S"]   = y[1]
+CT[5, "E"]   = y[2]
+CT[5, "I_p"] = y[3]
+CT[5, "I_c"] = y[4]
+CT[5, "I_a"] = y[5]
+CT[5, "Q"]   = y[6]
+CT[5, "Q_a"] = y[7]
+CT[5, "S_q"] = y[8]
+CT[5, "R"]   = y[9]
 
 for (i in seq(5,t) ) {
   S   = CT[i,"S"]
@@ -123,35 +126,35 @@ for (i in seq(5,t) ) {
   S_q = CT[i,"S_q"]
   R   = CT[i, "R"]
   N   = S + E + I_p + I_c + I_a + Q + Q_a + S_q + R
-  
+
   CT[i+1, "S"] =   S - S * alpha * c * (I_p + b_c * I_c + b_a * I_a)/N- (E4*r*deltaE) * q * (1-alpha) * c * (b_c*(S+S1)+(S2+S3))/N + deltaS_q * S_q
-  
-  
+
+
   CT[i+1, "E"] =   E + S * alpha * c * (I_p + b_c * I_c + b_a * I_a)/N- (E4*r*deltaE) * c * q * alpha * (b_c*(S+S1)+(S2+S3))/N- deltaE * E
-  
-  
+
+
   CT[i+1, "I_p"] =  I_p+ r * deltaE * E - deltaI_p * I_p
-  
-  
+
+
   CT[i+1, "I_c"] =  I_c+ deltaI_p * I_p+ deltaQ * Q- deltaI_c * I_c
-  
-  
+
+
   CT[i+1, "I_a"] =  I_a+ (1-r) * deltaE * E- deltaI_a * I_a
-  
-  
+
+
   CT[i+1, "Q"] =  Q+ (E4*r*deltaE) * c * q * alpha * r * (b_c*(S+S1)+(S2+S3))/N- deltaQ * Q
-  
-  
+
+
   CT[i+1, "Q_a"] =  Q_a+ (E4*r*deltaE) * c * q * alpha * (1-r) * (b_c*(S+S1)+(S2+S3))/N-deltaQ_a * Q_a
-  
-  
+
+
   CT[i+1, "S_q"] =  S_q + (E4*r*deltaE) * q * (1-alpha) * c * (b_c*(S+S1)+(S2+S3))/N - deltaS_q * S_q
-  
+
   CT[i+1, "R"] =  R + deltaI_c * I_c + deltaQ_a * Q_a + deltaI_a * I_a
 }
 
-# Just a few modifications to make the code more easier to read
-df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"], 
+ #Just a few modifications to make the code more easier to read
+df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"],
                  "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"], "R" = CT[, "R"])
 
 plot(0:t, df$S, type ="l", col = "black", ylim = c(0, 1), ylab = "size", xlab = "time")
@@ -160,36 +163,35 @@ lines(0:t, df$E, col = "orange")
 
 lines(0:t, df$I_p, col = "red")
 
-lines(0:t, df$I_c, col = "purple")
+ lines(0:t, df$I_c, col = "purple")
 
-lines(0:t, df$I_a, col = "green")
+ lines(0:t, df$I_a, col = "green")
 
-lines(0:t, df$Q, col = "yellow")
+ lines(0:t, df$Q, col = "yellow")
 
-lines(0:t, df$Q_a, col = "brown")
+ lines(0:t, df$Q_a, col = "brown")
 
-lines(0:t, df$S_q, col = "blue")
+ lines(0:t, df$S_q, col = "blue")
 
-lines(0:t, df$R, col = "pink")
+ lines(0:t, df$R, col = "pink")
 
-legend( "topright", c("E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q", "R"), 
-        text.col=c("orange", "red", "purple", "green", "yellow", "brown", "blue", "pink") )
+ legend( "topright", c("E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q", "R"),
+         text.col=c("orange", "red", "purple", "green", "yellow", "brown", "blue", "pink") )
 
+plot(0:t-1, CT[,"S"], type ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
+lines(0:t-1, CT[,"E"], col = "orange")
 
-# plot(0:t-1, CT[,"S"], type ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
-# lines(0:t-1, CT[,"E"], col = "orange")
-# 
-# lines(0:t-1, CT[,"I_p"], col = "red")
-# 
-# lines(0:t-1, CT[,"I_c"], col = "purple")
-# 
-# lines(0:t-1, CT[,"I_a"], col = "green")
-# 
-# lines(0:t-1, CT[,"Q"], col = "yellow")
-# 
-# lines(0:t-1, CT[,"Q_a"], col = "brown")
-# 
-# lines(0:t-1, CT[,"S_q"], col = "blue")
+lines(0:t-1, CT[,"I_p"], col = "red")
+
+lines(0:t-1, CT[,"I_c"], col = "purple")
+
+lines(0:t-1, CT[,"I_a"], col = "green")
+
+lines(0:t-1, CT[,"Q"], col = "yellow")
+
+lines(0:t-1, CT[,"Q_a"], col = "brown")
+
+lines(0:t-1, CT[,"S_q"], col = "blue")
 
 
 
