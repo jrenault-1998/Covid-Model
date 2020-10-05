@@ -17,10 +17,14 @@ library(curl)
 
 # Parameters as proposed for the new model
 
-# Prob. transmission given contact 
-alpha <- 0.2068
+#"Calculated" Beta
+beta <- 0.07165242
 
-#
+# Contact rate
+c <- 1
+
+# Prob. transmission given contact 
+alpha = beta/c
 
 # Days the model runs
 t <- 200
@@ -28,14 +32,11 @@ t <- 200
 # Days for test results 
 tau <- 2
 
-# Contact rate
-c <- 8
-
 # Prob. E -> I_p given leaving E 
 r <- 0.9
 
 # Contact tracing effectiveness rate 
-q <- 0.9
+q <- 0.5
 
 # Decrease in asymptomatic infectivity
 b_a <- 0.5
