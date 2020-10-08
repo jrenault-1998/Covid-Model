@@ -69,7 +69,8 @@ deltaS_q <- 1 / 14
 N <- 1
 
 # Assumed the epidemic begins with 0.0001% of population exposed
-E0 = 10^(-4)   
+# Canada's March 11 confirmed cases of covid
+E0 = 2.74*10^(-6)   
 
 y  = c(
   S = (N - E0),
@@ -158,7 +159,7 @@ for (i in seq(5,t) ) {
 df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"],
                  "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"], "R" = CT[, "R"])
 
-plot(0:t, df$S, type ="l", col = "black", ylim = c(0, 1), ylab = "size", xlab = "time")
+plot(0:t, df$S, type ="l", col = "black", ylim = c(0, 0.3), ylab = "size", xlab = "time")
 
 lines(0:t, df$E, col = "orange")
 
@@ -179,7 +180,7 @@ lines(0:t, df$I_p, col = "red")
  legend( "topright", c("E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q", "R"),
          text.col=c("orange", "red", "purple", "green", "yellow", "brown", "blue", "pink") )
 
-plot(0:t-1, CT[,"S"], type ="l", col = "black", ylim = c(0,1), ylab = "size", xlab = "time")
+plot(0:t-1, CT[,"S"], type ="l", col = "black", ylim = c(0,0.1), ylab = "size", xlab = "time")
 lines(0:t-1, CT[,"E"], col = "orange")
 
 lines(0:t-1, CT[,"I_p"], col = "red")
