@@ -18,10 +18,10 @@ library(curl)
 # Parameters as proposed for the new model
 
 #"Calculated" Beta
-beta <- 0.07165242
+beta <- 0.516
 
 # Contact rate
-c <- 1
+c <- 5
 
 # Prob. transmission given contact 
 alpha = beta/c
@@ -33,10 +33,10 @@ t <- 200
 tau <- 2
 
 # Prob. E -> I_p given leaving E 
-r <- 0.9
+r <- 0.5
 
 # Contact tracing effectiveness rate 
-q <- 0.5
+q <-  0.25 #0.75
 
 # Decrease in asymptomatic infectivity
 b_a <- 0.5
@@ -112,7 +112,10 @@ CT[5, "Q"]   = y[6]
 CT[5, "Q_a"] = y[7]
 CT[5, "S_q"] = y[8]
 CT[5, "R"]   = y[9]
-
+CT[1, "E"]   = 0
+CT[2, "E"]   = 0
+CT[3, "E"]   = 0
+CT[4, "E"]   = 0
 for (i in seq(5,t) ) {
   S   = CT[i,"S"]
   S1  = CT[i-1,"S"]
@@ -159,7 +162,7 @@ for (i in seq(5,t) ) {
 df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"],
                  "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"], "R" = CT[, "R"])
 
-plot(0:t, df$S, type ="l", col = "black", ylim = c(0, 0.3), ylab = "size", xlab = "time")
+plot(0:t, df$S, type ="l", col = "black", ylim = c(0, 0.005), xlim = c(100, 200), ylab = "size", xlab = "time")
 
 lines(0:t, df$E, col = "orange")
 
@@ -180,20 +183,20 @@ lines(0:t, df$I_p, col = "red")
  legend( "topright", c("E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q", "R"),
          text.col=c("orange", "red", "purple", "green", "yellow", "brown", "blue", "pink") )
 
-plot(0:t-1, CT[,"S"], type ="l", col = "black", ylim = c(0,0.1), ylab = "size", xlab = "time")
-lines(0:t-1, CT[,"E"], col = "orange")
-
-lines(0:t-1, CT[,"I_p"], col = "red")
-
-lines(0:t-1, CT[,"I_c"], col = "purple")
-
-lines(0:t-1, CT[,"I_a"], col = "green")
-
-lines(0:t-1, CT[,"Q"], col = "yellow")
-
-lines(0:t-1, CT[,"Q_a"], col = "brown")
-
-lines(0:t-1, CT[,"S_q"], col = "blue")
+# plot(0:t-1, CT[,"S"], type ="l", col = "black", ylim = c(0,0.1), ylab = "size", xlab = "time")
+# lines(0:t-1, CT[,"E"], col = "orange")
+# 
+# lines(0:t-1, CT[,"I_p"], col = "red")
+# 
+# lines(0:t-1, CT[,"I_c"], col = "purple")
+# 
+# lines(0:t-1, CT[,"I_a"], col = "green")
+# 
+# lines(0:t-1, CT[,"Q"], col = "yellow")
+# 
+# lines(0:t-1, CT[,"Q_a"], col = "brown")
+# 
+# lines(0:t-1, CT[,"S_q"], col = "blue")
 
 
 
