@@ -22,10 +22,11 @@ library(curl)
 beta <- 2*0.516
 
 # Contact rate
-c <- 5
+c.vec <- c(5,7)
 
 # Prob. transmission given contact
-alpha = beta/c
+#alpha = beta/c
+alpha <- 0.18
 
 # Days the model runs
 t <- 200
@@ -118,7 +119,10 @@ CT[2, "E"]   = 0
 CT[3, "E"]   = 0
 CT[4, "E"]   = 0
 
-output <- NULL
+output <- matrix(0,nrow = length(q.vec), ncol=length(c.vec))
+
+for(k in 1:length(c.vec)){
+  c<-c.vec[k]
 
 for(j in 1:length(q.vec)){
 
@@ -166,11 +170,12 @@ for (i in seq(5,t-1) ) {
   CT[i+1, "R"] =  R + deltaI_c * I_c + deltaQ_a * Q_a + deltaI_a * I_a
 }
 
-output[j] <- CT[t,"R"]
+output[j,k] <- CT[t,"R"]
 
-}
+}}
 
-plot(q.vec,output, typ = "l")
+plot(q.vec,output[,2], typ = "l")
+lines(q.vec, output[,1], col = "red")
 
  #Just a few modifications to make the code more easier to read
 df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"],
