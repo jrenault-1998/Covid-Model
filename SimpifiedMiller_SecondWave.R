@@ -18,25 +18,26 @@ library(curl)
 # Parameters as proposed for the new model
 
 #"Calculated" Beta
-beta <- 0.516
+#beta <- 0.516
+beta <- 2*0.516
 
 # Contact rate
 c <- 5
 
-# Prob. transmission given contact 
+# Prob. transmission given contact
 alpha = beta/c
 
 # Days the model runs
 t <- 200
 
-# Days for test results 
+# Days for test results
 tau <- 2
 
-# Prob. E -> I_p given leaving E 
+# Prob. E -> I_p given leaving E
 r <- 0.5
 
-# Contact tracing effectiveness rate 
-q <-  0.25 #0.75
+# Contact tracing effectiveness rate
+q.vec <-  seq(0,1,0.05) #0.75
 
 # Decrease in asymptomatic infectivity
 b_a <- 0.5
@@ -62,7 +63,7 @@ deltaQ <- 1 / ((1/deltaE + 1/deltaI_p)/2 + tau)
 # Mean time spent in Q_a
 deltaQ_a <- 1 / 14
 
-# Mean time spent in S_q 
+# Mean time spent in S_q
 deltaS_q <- 1 / 14
 
 # Initial Population size
@@ -70,7 +71,7 @@ N <- 1
 
 # Assumed the epidemic begins with 0.0001% of population exposed
 # Canada's March 11 confirmed cases of covid
-E0 = 2.74*10^(-6)   
+E0 = 2.74*10^(-6)
 
 y  = c(
   S = (N - E0),
@@ -116,7 +117,14 @@ CT[1, "E"]   = 0
 CT[2, "E"]   = 0
 CT[3, "E"]   = 0
 CT[4, "E"]   = 0
-for (i in seq(5,t) ) {
+
+output <- NULL
+
+for(j in 1:length(q.vec)){
+
+q<-q.vec[j]
+
+for (i in seq(5,t-1) ) {
   S   = CT[i,"S"]
   S1  = CT[i-1,"S"]
   S2  = CT[i-2,"S"]
@@ -158,44 +166,50 @@ for (i in seq(5,t) ) {
   CT[i+1, "R"] =  R + deltaI_c * I_c + deltaQ_a * Q_a + deltaI_a * I_a
 }
 
+output[j] <- CT[t,"R"]
+
+}
+
+plot(q.vec,output, typ = "l")
+
  #Just a few modifications to make the code more easier to read
 df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"],
                  "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"], "R" = CT[, "R"])
 
-plot(0:t, df$S, type ="l", col = "black", ylim = c(0, 0.005), xlim = c(100, 200), ylab = "size", xlab = "time")
-
-lines(0:t, df$E, col = "orange")
-
-lines(0:t, df$I_p, col = "red")
-
- lines(0:t, df$I_c, col = "purple")
-
- lines(0:t, df$I_a, col = "green")
-
- lines(0:t, df$Q, col = "yellow")
-
- lines(0:t, df$Q_a, col = "brown")
-
- lines(0:t, df$S_q, col = "blue")
-
- lines(0:t, df$R, col = "pink")
-
- legend( "topright", c("E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q", "R"),
-         text.col=c("orange", "red", "purple", "green", "yellow", "brown", "blue", "pink") )
+# plot(0:t, df$S, type ="l", col = "black", ylim = c(0, 0.005), xlim = c(100, 200), ylab = "size", xlab = "time")
+#
+# lines(0:t, df$E, col = "orange")
+#
+# lines(0:t, df$I_p, col = "red")
+#
+#  lines(0:t, df$I_c, col = "purple")
+#
+#  lines(0:t, df$I_a, col = "green")
+#
+#  lines(0:t, df$Q, col = "yellow")
+#
+#  lines(0:t, df$Q_a, col = "brown")
+#
+#  lines(0:t, df$S_q, col = "blue")
+#
+#  lines(0:t, df$R, col = "pink")
+#
+#  legend( "topright", c("E", "I_p", "I_c", "I_a", "Q", "Q_a", "S_q", "R"),
+#          text.col=c("orange", "red", "purple", "green", "yellow", "brown", "blue", "pink") )
 
 # plot(0:t-1, CT[,"S"], type ="l", col = "black", ylim = c(0,0.1), ylab = "size", xlab = "time")
 # lines(0:t-1, CT[,"E"], col = "orange")
-# 
+#
 # lines(0:t-1, CT[,"I_p"], col = "red")
-# 
+#
 # lines(0:t-1, CT[,"I_c"], col = "purple")
-# 
+#
 # lines(0:t-1, CT[,"I_a"], col = "green")
-# 
+#
 # lines(0:t-1, CT[,"Q"], col = "yellow")
-# 
+#
 # lines(0:t-1, CT[,"Q_a"], col = "brown")
-# 
+#
 # lines(0:t-1, CT[,"S_q"], col = "blue")
 
 
