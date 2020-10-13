@@ -29,7 +29,21 @@ R_{j+1} &=& R_j + \delta_{I_{C}} I_{C_{j}} + \delta_{I_{A}} I_{A_{j}} + \delta_{
 
 
 \section{Parameters} \label{parameters}
-Parameters have similar meaning to that of Miller model with a some additions.
-
+\begin{itemize}
+\item c : Contact rate between an infectious individual and susceptible individuals
+\item $\alpha$: Probability of transmission given a contact
+\item $\tau$ : Days for covid-19 test results
+\item $r$: Probability that an exposed individual becomes presymptomatic and move to $I_P$
+\item $q$: Contact tracing effectiveness rate
+\item  $b_A$ : Decrease in asymptomatic infectivity
+\item $b_C$: Decrease in clinical infectivity
+\item $\delta_E$: Mean time spent in Exposed
+\item $\delta_{I_{P}}$: Mean time spent in Infected Pre-Clinical
+\item $\delta_{I_{C}}$: Mean time spent in Infected Clinical
+\item $\delta_{I_{A}}$: Mean time spent in Infected asymptomatic
+\item $\delta_Q$: Mean time spent in Q (Quarantine)
+\item $\delta_{Q_{A}}$: Mean time spent in $Q_A$
+\item $\delta_{S_{Q}}$: Mean time spent in $S_Q$
+\end{itemize}
 
 \end{document}
