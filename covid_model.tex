@@ -1,0 +1,35 @@
+\documentclass[12pt]{article}
+\usepackage[utf8x]{inputenc}  
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumerate}
+\usepackage[left=1.4cm,right=0.7cm,top=2cm,bottom=2cm]{geometry}
+
+
+\title{COVID-19 Model Containing Contact Tracing and Quarantine}
+\date{}
+
+\begin{document} 
+
+\maketitle
+
+\section{Model Equations} \label{equations}
+
+\begin{eqnarray}
+S_{j+1} &=&  S_j - S_j \alpha c \left( \frac{I_P + b_cI_C + b_aI_A}{N}\right) -(r \delta_E E_{j-4} ) q (1-\alpha) c  (b_c (S_j + S_{j-1}) + (S_{j-2} + S_{j-3})) \frac{1}{N} \\
+E_{j+1} &=& E_j - S_j \alpha c \left( \frac{I_P + b_cI_C + b_aI_A}{N}\right) -(r \delta_E E_{j-4} ) q \alpha c  (b_c (S_j + S_{j-1}) + (S_{j-2} + S_{j-3})) \frac{1}{N} - \delta_E E_j\\
+I_{P_{j+1}} &=& I_{Pj} + r\delta_E E_j - \delta_{I_P} I_{Pj}\\
+ I_{C_{j+1}}&=& I_{Cj} + \delta_{I_P} I_{Pj} + \delta_Q Q_j - \delta_{I_C} I_{Cj}\\
+I_{A_{j+1}} &=& I_{Aj} + (1-r) \delta_E E_j  - \delta_{I_A} I_{Aj}\\
+Q_{j+1} &=& Q_j + (r \delta_E E_{j-4} ) c q \alpha r (b_c (S_j + S_{j-1}) + (S_{j-2} + S_{j-3})) \frac{1}{N} - \delta_Q Q_j\\
+ Q_{A_{j+1}}&=& Q_{A_{j}} +  (r \delta_E E_{j-4} ) c q \alpha (1- r) (b_c (S_j + S_{j-1}) + (S_{j-2} + S_{j-3})) \frac{1}{N} - \delta_{Q_{A}} Q_{A_{j}} \\
+S_{Q_{j+1}} &=& S_{Q_{j}} + (r \delta_E E_{j-4} ) q (1- \alpha) c  (b_c (S_j + S_{j-1}) + (S_{j-2} + S_{j-3})) \frac{1}{N}  - \delta_{S_{Q}} S_{Q_{j}} \\
+R_{j+1} &=& R_j + \delta_{I_{C}} I_{C_{j}} + \delta_{I_{A}} I_{A_{j}} + \delta_{Q_{A}} Q_{A_{j}}
+\end{eqnarray}
+
+
+\section{Parameters} \label{parameters}
+Parameters have similar meaning to that of Miller model with a some additions.
+
+
+\end{document}
