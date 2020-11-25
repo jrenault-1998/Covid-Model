@@ -18,7 +18,7 @@ require(deSolve)
 # Prob. transmission given contact
 #alpha = beta/c
 #alpha <- 0.18
-alpha.vec <- seq(0,1,0.1)
+alpha.vec <- seq(0.1,0.2,0.02)
 
 # Days the model runs
 t <- 100
@@ -139,7 +139,7 @@ output = matrix(rep(0,length(alpha.vec)*length(q.vec)),nrow=length(q.vec), ncol=
 # specify start and end values for the search across c values.
 c.start <- 0
 c.end <- 20
-target <- 0.1
+target <- 0.001
 
 for(k in 1:length(alpha.vec)){
   alpha<-alpha.vec[k]
