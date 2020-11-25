@@ -21,20 +21,20 @@ library(curl)
 #beta <- 0.516
 
 # Contact rate
-c.vec <- seq(2,4,0.5)
+c <- 5
 
 # Prob. transmission given contact
 #alpha = beta/c
-alpha <- 0.18
+alpha.vec <- seq(0.12,0.2,0.02)
 
 # Days the model runs
-t <- 200
+t <- 100
 
 # Days for test results
 tau <- 2
 
 # Prob. E -> I_p given leaving E
-r <- 0.75
+r <- mean(0.4,0.25,0.37,0.42,0.51,0.59,0.2,0.76,0.76)
 
 # Contact tracing effectiveness rate
 q.vec <-  seq(0,1,0.05) #0.75
@@ -46,7 +46,7 @@ b_a <- 0.5
 b_c <- 0.1
 
 # Mean time spent in Exposed
-deltaE <- 1 / 4
+deltaE <- 1 / 3
 
 # Mean time spent in Infected_Pre-Clinical
 deltaI_p <- 1 / 2
@@ -55,7 +55,7 @@ deltaI_p <- 1 / 2
 deltaI_c <- 1 / 3
 
 # Mean time spent in Infected_Asymptomatic
-deltaI_a <- 1 / 7
+deltaI_a <- 1 / 5
 
 # Mean time spent in Q
 deltaQ <- 1 / ((1/deltaE + 1/deltaI_p)/2 + tau)
@@ -85,15 +85,6 @@ y  = c(
   R = 0
 )
 
-# The following is a series adjusted for quarantining given contact tracing, adjusted using Miller et. al & Tang et. al
-
-## The following has only been partially updated (Not entirely sure options out of Q)
-
-# for(t in seq(1,4,1)){
-#   val <- N0*lambda^t
-#   new.result <- data.frame(time = t, popn.size = val)
-#   df <- rbind(df, new.result)
-# }
 
 CT_size <- (t+1) * 8
 
@@ -118,10 +109,10 @@ CT[2, "E"]   = 0
 CT[3, "E"]   = 0
 CT[4, "E"]   = 0
 
-output <- matrix(0,nrow = length(q.vec), ncol=length(c.vec))
+output <- matrix(0,nrow = length(q.vec), ncol=length(alpha.vec))
 
-for(k in 1:length(c.vec)){
-  c<-c.vec[k]
+for(k in 1:length(alpha.vec)){
+  alpha<-alpha.vec[k]
   
   for(j in 1:length(q.vec)){
     
@@ -173,14 +164,14 @@ for(k in 1:length(c.vec)){
     
   }}
 
-plot (q.vec, output[,1], typ = "l", ylim = c(0, 1), xlim = c(0, 1), ylab = "R Final", xlab = "Contact Tracing Effectiveness", main = "r=0.75")
+plot (q.vec, output[,1], typ = "l", ylim = c(0, 1), xlim = c(0, 1), ylab = "R Final", xlab = "Contact Tracing Effectiveness", main = "c=5")
 lines(q.vec, output[,2], col = "red")
 lines(q.vec, output[,3], col = "blue")
 lines(q.vec, output[,4], col = "orange")
 lines(q.vec, output[,5], col = "green")
-legend( "topright", c("c=2", "c=2.5", "c=3", "c=3.5", "c=4"),
+legend( "topright", c("alpha=0.12", "alpha=0.14", "alpha=0.16", "alpha=0.18", "alpha=0.20"),
                 text.col=c("black", "red", "blue", "orange", "green") )
 
-df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"],
-                 "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"], "R" = CT[, "R"])
-
+# df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"],
+#                  "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"], "R" = CT[, "R"])
+# 
