@@ -21,11 +21,11 @@ library(curl)
 #beta <- 0.516
 
 # Contact rate
-c <- 5
+#c <- 5
 
 # Prob. transmission given contact
 #alpha = beta/c
-alpha.vec <- seq(0.12,0.2,0.02)
+alpha.vec <- seq(0.1,0.2,0.1)
 
 # Days the model runs
 t <- 100
@@ -37,7 +37,7 @@ tau <- 2
 r <- mean(0.4,0.25,0.37,0.42,0.51,0.59,0.2,0.76,0.76)
 
 # Contact tracing effectiveness rate
-q.vec <-  seq(0,1,0.05) #0.75
+q.vec <-  seq(0,1,0.5) #0.75
 
 # Decrease in asymptomatic infectivity
 b_a <- 0.5
@@ -71,8 +71,10 @@ N <- 1
 
 # Assumed the epidemic begins with 0.0001% of population exposed
 # Canada's March 11 confirmed cases of covid
-E0 = 2.74*10^(-6)
+E0 <- 2.74*10^(-6)
 
+
+timeloop = function(c){
 y  = c(
   S = (N - E0),
   E = E0,
@@ -111,12 +113,12 @@ CT[4, "E"]   = 0
 
 output <- matrix(0,nrow = length(q.vec), ncol=length(alpha.vec))
 
-for(k in 1:length(alpha.vec)){
-  alpha<-alpha.vec[k]
-  
-  for(j in 1:length(q.vec)){
-    
-    q<-q.vec[j]
+# for(k in 1:length(alpha.vec)){
+#   alpha<-alpha.vec[k]
+#   
+#   for(j in 1:length(q.vec)){
+#     
+#     q<-q.vec[j]
     
     for (i in seq(5,t-1) ) {
       S   = CT[i,"S"]
@@ -160,17 +162,49 @@ for(k in 1:length(alpha.vec)){
       CT[i+1, "R"] =  R + deltaI_c * I_c + deltaQ_a * Q_a + deltaI_a * I_a
     }
     
-    output[j,k] <- CT[t,"R"]
+diff.target = unname(CT[i+1,"R"]) - target
+# The function returns the differnce between the final value of R and the target value
+return(diff.target)
     
+#  }}    #Commented for loop
+}
+
+#preallocate the output
+output = matrix(rep(0,length(alpha.vec)*length(q.vec)),nrow=length(q.vec), ncol=length(alpha.vec))
+# specify start and end values for the search across c values.
+c.start <- 0
+c.end <- 20
+
+for(k in 1:length(alpha.vec)){
+  alpha<-alpha.vec[k]
+  for(j in 1:length(q.vec)){
+    q <-q.vec[j]
+    target <- 0.001
+     # The if clause is to prevent uniroot giving an error if there
+     # exists no value of the final R such that the target is meet.
+     # if(sign(timeloop(c.start))==sign(timeloop(c.end))){
+     #   a <- 1 #output[j,k]=NA
+     #   }
+     #else{
+    print(c(alpha,q))
+      cval <- uniroot(timeloop,c(c.start,c.end))$root
+      output[j,k] <- cval
+    
+      #}
   }}
 
-plot (q.vec, output[,1], typ = "l", ylim = c(0, 1), xlim = c(0, 1), ylab = "R Final", xlab = "Contact Tracing Effectiveness", main = "c=5")
-lines(q.vec, output[,2], col = "red")
-lines(q.vec, output[,3], col = "blue")
-lines(q.vec, output[,4], col = "orange")
-lines(q.vec, output[,5], col = "green")
-legend( "topright", c("alpha=0.12", "alpha=0.14", "alpha=0.16", "alpha=0.18", "alpha=0.20"),
-                text.col=c("black", "red", "blue", "orange", "green") )
+filled.contour(q.vec,alpha.vec,output, xlab = "q", ylab = "alpha")
+
+
+
+
+# plot (q.vec, output[,1], typ = "l", ylim = c(0, 1), xlim = c(0, 1), ylab = "R Final", xlab = "Contact Tracing Effectiveness", main = "c=5")
+# lines(q.vec, output[,2], col = "red")
+# lines(q.vec, output[,3], col = "blue")
+# lines(q.vec, output[,4], col = "orange")
+# lines(q.vec, output[,5], col = "green")
+# legend( "topright", c("alpha=0.12", "alpha=0.14", "alpha=0.16", "alpha=0.18", "alpha=0.20"),
+#                 text.col=c("black", "red", "blue", "orange", "green") )
 
 # df <- data.frame("S" = CT[, "S"], "E" = CT[, "E"],"I_p" = CT[, "I_p"], "I_c" = CT[,"I_c"],
 #                  "I_a" = CT[,"I_a"], "Q" = CT[, "Q"], "Q_a" = CT[,"Q_a"], "S_q" = CT[,"S_q"], "R" = CT[, "R"])

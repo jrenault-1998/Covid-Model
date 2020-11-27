@@ -156,6 +156,12 @@ for(k in 1:length(alpha.vec)){
 
 filled.contour(q.vec,alpha.vec,output, xlab = "q", ylab = "alpha")
 
+
+for(k in 1:length(alpha.vec)){
+  alpha<-alpha.vec[k]
+  for(j in 1:length(q.vec)){
+    q<-q.vec[j]
+
 # However, I am not clear why R final can be bigger than 1. I think there
 # is a mistake in your original code, which I just put inside a function
 # and left unchanged. If N = 1 and there are no births and deaths, then
