@@ -74,7 +74,7 @@ N <- 1
 E0 <- 2.74*10^(-6)
 
 
-timeloop = function(c){
+timeloop = function(c, alpha, q){
 y  = c(
   S = (N - E0),
   E = E0,
