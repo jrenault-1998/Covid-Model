@@ -185,7 +185,7 @@ for(k in 1:length(alpha.vec)){
        }
      else{
     print(c(alpha,q))
-      cval <- uniroot(timeloop,c(c.start,c.end))$root
+      cval <- uniroot(timeloop,c(c.start,c.end))$root    #Throws error near q&alpha max
       output[j,k] <- cval
 
       }
