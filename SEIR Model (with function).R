@@ -150,7 +150,7 @@ for(k in 1:length(alpha.vec)){
     if(sign(timeloop(c.start))==sign(timeloop(c.end))){
       output[j,k]=NA}
     else{
-      cval <- uniroot(timeloop,c(c.start,c.end))$root
+      cval <- uniroot(timeloop(alpha,q),c(c.start,c.end))$root
       output[j,k] <- cval}
   }}
 
