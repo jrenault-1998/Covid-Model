@@ -189,13 +189,14 @@ for(k in 1:length(alpha.vec)){
       output[j,k] <- cval
 
       }
-  }}
+  }
+}
 
 filled.contour(q.vec,alpha.vec,output, xlab = "q", ylab = "alpha")
 
 
 
-#Creates plots with specific c values
+# Creates plots with specific c values
 # target = 0
 # for(i in 1:length(c.vec)){
 #   c<- c.vec[i]
