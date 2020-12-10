@@ -25,10 +25,10 @@ c.vec <- seq(2,10,2)
 
 # Prob. transmission given contact
 #alpha ~ beta/c                     #The plots are sensitive to vector modification!
-alpha.vec <- seq(0.12,0.2,0.02)
+alpha.vec <- seq(0.1,0.25,0.02)
 
 # Contact tracing effectiveness rate
-q.vec <-  seq(0,1,0.2)
+q.vec <-  seq(0, 1, 0.2)
 
 # Days the model runs
 t <- 100
@@ -168,24 +168,24 @@ output = matrix(rep(0,length(alpha.vec)*length(q.vec)),nrow=length(q.vec), ncol=
 
 
 #Creates contour plot winding c values for a target R value
-target <- 0.001
+target <- 0.01
 
 # specify start and end values for the search across c values.
 c.start <- 0
-c.end <- 20
+c.end <- 10
 
 for(k in 1:length(alpha.vec)){
   alpha<-alpha.vec[k]
   for(j in 1:length(q.vec)){
     q <-q.vec[j]
-     # The if clause is to prevent uniroot giving an error if there
-     # exists no value of the final R such that the target is meet.
+    # The if clause is to prevent uniroot giving an error if there
+    # exists no value of the final R such that the target is meet.
+    print(c(alpha,q))
      if(sign(timeloop(c.start))==sign(timeloop(c.end))){
        a <- 1   #output[j,k]=NA
        }
      else{
-    print(c(alpha,q))
-      cval <- uniroot(timeloop,c(c.start,c.end))$root    #Throws error near q&alpha max
+      cval <- uniroot(timeloop,c(c.start,c.end), tol = 1e-9)$root    #Throws error near q&alpha max
       output[j,k] <- cval
 
       }
