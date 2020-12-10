@@ -25,10 +25,10 @@ c.vec <- seq(2,10,2)
 
 # Prob. transmission given contact
 #alpha ~ beta/c                     #The plots are sensitive to vector modification!
-alpha.vec <- seq(0.1,0.25,0.02)
+alpha.vec <- seq(0.1,0.24,0.02)
 
 # Contact tracing effectiveness rate
-q.vec <-  seq(0, 1, 0.2)
+q.vec <-  seq(0, 1, 0.1)
 
 # Days the model runs
 t <- 100
@@ -172,7 +172,7 @@ target <- 0.01
 
 # specify start and end values for the search across c values.
 c.start <- 0
-c.end <- 10
+c.end <- 15
 
 for(k in 1:length(alpha.vec)){
   alpha<-alpha.vec[k]
@@ -180,12 +180,12 @@ for(k in 1:length(alpha.vec)){
     q <-q.vec[j]
     # The if clause is to prevent uniroot giving an error if there
     # exists no value of the final R such that the target is meet.
-    print(c(alpha,q))
+    #    print(c(alpha,q))
      if(sign(timeloop(c.start))==sign(timeloop(c.end))){
        a <- 1   #output[j,k]=NA
        }
      else{
-      cval <- uniroot(timeloop,c(c.start,c.end), tol = 1e-9)$root    #Throws error near q&alpha max
+      cval <- uniroot(timeloop,c(c.start,c.end), tol = 1e-9)$root    
       output[j,k] <- cval
 
       }
@@ -197,23 +197,25 @@ filled.contour(q.vec,alpha.vec,output, xlab = "q", ylab = "alpha")
 
 
 # Creates plots with specific c values
-# target = 0
-# for(i in 1:length(c.vec)){
-#   c<- c.vec[i]
-#   for(k in 1:length(alpha.vec)){
-#     alpha<-alpha.vec[k]
-#     for(j in 1:length(q.vec)){
-#       q <-q.vec[j]
-#       output[j,k] <- timeloop(c)
-# 
-#     }
-#   }
-#   plot (q.vec, output[,1], typ = "l", ylim = c(0, 1), xlim = c(0, 1), ylab = "R Final", xlab = "Contact Tracing Effectiveness", main = paste("c =",c))
-#   lines(q.vec, output[,2], col = "red")
-#   lines(q.vec, output[,3], col = "blue")
-#   lines(q.vec, output[,4], col = "orange")
-#   lines(q.vec, output[,5], col = "green")
-#   legend( "topright", c("alpha=0.12", "alpha=0.14", "alpha=0.16", "alpha=0.18", "alpha=0.20"),
-#           text.col=c("black", "red", "blue", "orange", "green") )
-# }
+target = 0
+for(i in 1:length(c.vec)){
+  c<- c.vec[i]
+  for(k in 1:length(alpha.vec)){
+    alpha<-alpha.vec[k]
+    for(j in 1:length(q.vec)){
+      q <-q.vec[j]
+      output[j,k] <- timeloop(c)
+
+    }
+  }
+  plot (q.vec, output[,1], typ = "l", ylim = c(0, 1), xlim = c(0, 1), ylab = "R Final", xlab = "Contact Tracing Effectiveness", main = paste("c =",c))
+  lines(q.vec, output[,2], col = "red")
+  lines(q.vec, output[,3], col = "blue")
+  lines(q.vec, output[,4], col = "orange")
+  lines(q.vec, output[,5], col = "green")
+  lines(q.vec, output[,6], col = "yellow")
+  lines(q.vec, output[,7], col = "purple")
+  legend( "topright", c("alpha=0.12", "alpha=0.14", "alpha=0.16", "alpha=0.18", "alpha=0.20", "alpha=0.22", "alpha=0.24"),
+          text.col=c("black", "red", "blue", "orange", "green", "yellow", "purple") )
+}
 
