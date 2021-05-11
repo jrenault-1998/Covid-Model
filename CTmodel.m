@@ -9,7 +9,7 @@ alpha = 0.18;
 C = 0.75/alpha;     %beta = alpha*C s.t. beta=0.75
 bc = 0.5;           %reduction in contacts|symptomatic?
 ba = 0.75;
-h =0.8;
+h =0.8;             %Contact tracing efficacy
 tau = 4;            %Estimate, I need to find this ave. value
 deltaE = 1/4;
 deltaIp = 1/2.4;
@@ -28,17 +28,18 @@ x3 = x1+r/deltaE;
 x4 = x2+(1-r)/deltaE;
 v = 0.06/7;         %0.06 of pop. every week
 N = 1;
+totalpop = 5.2e5;   %Population of Newfoundland
 
 
-s0=0.9-3/(5.2e5);
-e0=0;
-ip=1/(5.2e5);
-ic=1/(5.2e5);
-ia=1/(5.2e5);
+s0=0.9-3/(totalpop);
+e0=0.1;
+ip=1/(totalpop); %Infectious, Presymptomatic
+ic=1/(totalpop);
+ia=1/(totalpop);
 q=0;
 qa=0;
 sq=0;
-sv=0.1;
+sv=0;
 iv=0;
 re=0;
 rv=0;
@@ -46,17 +47,20 @@ rv=0;
 Tf = 120; %days of simulation
 
 options = odeset('RelTol',1e-4,'AbsTol',1e-6);
-[T,Y] = ode45(@CTeq, 0:1:Tf, [s0;e0;ip;ic;ia;q;qa;sq;sv;iv;re;rv], options);
+%[T,Y] = ode45(@CTeq, 0:1:Tf, [s0;e0;ip;ic;ia;q;qa;sq;sv;iv;re;rv], options);
 
-% options1 = odeset('NonNegative', 1);   %Need NonNegative results!
-% [T1,Y1] = ode45(@CTeq, 0:1:Tf, [s0;e0;ip;ic;ia;q;qa;sq;sv;iv;re;rv], options1);
+options1 = odeset(options,'NonNegative', 1:12);   %Need NonNegative results
+[T,Y] = ode45(@CTeq, 0:1:Tf, [s0;e0;ip;ic;ia;q;qa;sq;sv;iv;re;rv], options1);
 
+pop = sum(Y');
 
 figure(1)
 
 
 subplot(1,2,1)
 title('...')
+plot(T,Y(:,1),'y','Linewidth',1)
+hold on
 plot(T,Y(:,2),'k','Linewidth',1)
 hold on
 plot(T,Y(:,3),'r','Linewidth',1)
@@ -81,6 +85,8 @@ hold on
 plot(T,Y(:,9),'g','Linewidth',1)
 hold on
 plot(T,Y(:,10),'b','Linewidth',1)
+hold on
+plot(T,Y(:,11),'y','Linewidth',1)
 %legend('I','location','best')
 %ylabel('')
 xlabel('time [days]')

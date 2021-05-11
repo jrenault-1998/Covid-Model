@@ -3,7 +3,7 @@ function dy = CTeq(t,y)
 global alpha C bc ba h tau deltaE deltaIp deltaIc deltaIa deltaQ deltaQa r epsilon Cv x1 x2 x3 x4 v deltasq deltaIv N
 
 
-S  = y(1);
+S  = y(1);  
 E  = y(2);
 Ip = y(3);
 Ic = y(4);
@@ -17,6 +17,12 @@ R  = y(11);
 Rv = y(12);
 
 dy = zeros(12,1);
+
+if Sv + Iv + Rv > 0.89
+    v=0;
+else
+    v=0.06/7;
+
 
 dy(1)  = -S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - Ic*h*(1-alpha)*C*tau*S/N + deltasq*Sq - v*N*S/(S+R);
 dy(2)  = S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - Ic*h*alpha*C*(1/deltaE)*S/N - deltaE*E;
