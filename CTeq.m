@@ -1,6 +1,6 @@
 function dydt = CTeq(t,y, Z)
 
-global alpha C bc ba q deltaE deltaIp deltaIc deltaIa deltaQ r epsilon1 epsilon2 Cv  v deltaSq deltaSv1 deltaIv N vmax vstop
+global start alpha C bc ba q deltaE deltaIp deltaIc deltaIa deltaQ r epsilon1 epsilon2 Cv  v deltaSq deltaSv1 deltaIv N vmax vstop
 
 ylag1 = Z(:,1);     %For Z(:,i), these values are t-i days before
 ylag2 = Z(:,2);

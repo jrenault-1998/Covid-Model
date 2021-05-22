@@ -5,7 +5,7 @@ clc
 
 
 %model parameters
-global alpha C bc ba q deltaE deltaIc deltaIa r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop
+global start alpha C bc ba q deltaE deltaIc deltaIa r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop
 
 alpha = 0.18;
 C = 0.5/alpha;             %beta = alpha*C s.t. beta=0.75
@@ -39,14 +39,30 @@ ic0=1/(totalpop);
 ia0=1/(totalpop);
 q0=0;
 sq0=0;
-sv0=0;
-iv0=0;
-re0=0;
-rv0=0;
+sv1=0;
+iv1=0;
+iv2=0;
+r0=0;
+sv2=0;
+
 
 Tf = 120; %days of simulation
 
-sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6],@ddex1hist,[0, Tf]);
+start = [s0;
+         e0;
+         ip0;
+         ic0;
+         ia0;
+         q0;
+         sq0;
+         sv1;
+         iv1;
+         iv2;
+         r0;
+         sv2];
+        
+
+sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], start(:,1) ,[0 Tf]);
 
 % options = odeset('RelTol',1e-4,'AbsTol',1e-6);
 % [T,Y] = ode45(@CTeq, 0:1:Tf, [s0;e0;ip0;ic0;ia0;q0;sq0;sv0;iv0;re0;rv0], options);
