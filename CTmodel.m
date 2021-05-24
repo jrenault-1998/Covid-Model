@@ -31,7 +31,6 @@ totalpop = 5.2e5;            %Population of Newfoundland
 vmax = 462000/totalpop;      %# of people eligible for vaccine
 vstop = 0.5;                 %stop CTing when vstop people are vaccinated
 
-<<<<<<< Updated upstream
 
 s0=1-3/(totalpop);
 e0=0;
@@ -48,70 +47,6 @@ sv2=0;
 
 
 Tf = 120; %days of simulation
-
-% Tf = 120; %days of simulation
-% 
-% options = odeset('RelTol',1e-4,'AbsTol',1e-6);
-% [T,Y] = ode45(@CTeq, 0:1:Tf, [s0;e0;ip;ic;ia;q;qa;sq;sv;iv;re;rv], options);
-% 
-% options1 = odeset(options,'NonNegative', 1:12);   %Need NonNegative results
-% [T,Y] = ode45(@CTeq, 0:1:Tf, [s0;e0;ip;ic;ia;q;qa;sq;sv;iv;re;rv], options1);
-
-
-options = odeset('RelTol',1e-4,'AbsTol',1e-6);
-Y(1, :)= [s0;e0;ip;ic;ia;q;qa;sq;sv;iv;re;rv];
-T(1) = 0;
-
-for i = 1:Tf
-%     [TempT,TempY] = ode45(@CTeq, i-1:i, Y(i, :), options);
-%     T(i+1) = TempT(end);
-%     Y(i+1,:) = TempY(end,:);
-    Tempdy = CTeq(i, Y(i, :));
-    
-    Y(i+1, :) = Tempdy' + Y(i, :);
-end
-
-pop = sum(Y');
-
-figure(1)
-
-
-subplot(1,2,1)
-title('...')
-plot(T,Y(:,1),'y','Linewidth',1)
-hold on
-plot(T,Y(:,2),'k','Linewidth',1)
-hold on
-plot(T,Y(:,3),'r','Linewidth',1)
-hold on
-plot(T,Y(:,4),'m','Linewidth',1)
-hold on
-plot(T,Y(:,5),'c','Linewidth',1)
-hold on
-plot(T,Y(:,6),'g','Linewidth',1)
-%legend('I','location','best')
-%ylabel('')
-xlabel('time [days]')
-%axis([ 0 Tf -0.1 55])
-set(gca,'fontsize',14)
-
-
-subplot(1,2,2)
-plot(T,Y(:,7),'r','Linewidth',1)
-hold on
-plot(T,Y(:,8),'c','Linewidth',1)
-hold on
-plot(T,Y(:,9),'g','Linewidth',1)
-hold on
-plot(T,Y(:,10),'b','Linewidth',1)
-hold on
-plot(T,Y(:,11),'y','Linewidth',1)
-%legend('I','location','best')
-%ylabel('')
-xlabel('time [days]')
-%axis([ 0 Tf -0.1 55])
-set(gca,'fontsize',14)
->>>>>>> Stashed changes
 
 start = [s0;
          e0;
@@ -188,6 +123,3 @@ sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], start(:,1) ,[0 Tf]);
 % %axis([ 0 Tf -0.1 55])
 % set(gca,'fontsize',14)
 % 
-
-
-

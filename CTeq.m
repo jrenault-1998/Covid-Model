@@ -28,34 +28,23 @@ Iv2 = y(10);
 R  = y(11);
 Sv2 = y(12);
 
-<<<<<<< Updated upstream
-=======
-
-dy = zeros(12,1);
->>>>>>> Stashed changes
 
 
 dy = zeros(11,1);
 
 if Sv1 + Iv1 + Iv2 + Sv2 > vmax
     v=0;
-<<<<<<< Updated upstream
 end
 
 
 if Sv1 + Iv1 + Iv2 + Sv2 > vstop
     q=0;
-=======
-else
-    v=0.06/7;
->>>>>>> Stashed changes
 end
 
 dy(1)  = -S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (E6*r*deltaE)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4+S5) - v*N*S/(S+R) + deltaSq*Sq;
 dy(2)  =  S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (E6*r*deltaE)*q*alpha*C*(bc*(S+S1)+S2+S3) - deltaE*E;
 dy(3)  = r*deltaE*E - (E6*r*deltaE)*r*q*alpha*C*(S4+S5) - deltaIp*Ip;
 dy(4)  = deltaIp*Ip - deltaIc*Ic;
-<<<<<<< Updated upstream
 dy(5)  = (1-r)*deltaE*E - (E6*r*deltaE)*(1-r)*q*alpha*C*(S4+S5) - deltaIa*Ia;
 dy(6)  = (E6*r*deltaE)*q*alpha*C*(bc*(S+S1)+S2+S3+S4+S5) - deltaQ*Q;
 dy(7)  = (E6*r*deltaE)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4+S5) - deltaSq*Sq; 
@@ -64,13 +53,3 @@ dy(9)  = Sv1*alpha*Cv*(1-epsilon1)*(Ip+bc*Ic+ba*Ia)/N - deltaIv*Iv1;
 dy(10) = Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N - deltaIv*Iv1;
 dy(11) = deltaIc*Ic + deltaIa*Ia + deltaQ*Q - v*N*R/(S+R);
 dy(12) = v*N*R/(S+R) + deltaIv*Iv1 + deltaSv1*Sv1 + deltaIv*Iv2 - Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N;
-=======
-dy(5)  = (1-r)*deltaE*E - Ic*h*alpha*C*x2*S/N - deltaIa*Ia;
-dy(6)  = Ic*h*alpha*C*x3*S/N - deltaQ*Q;
-dy(7)  = Ic*h*alpha*C*x4*S/N - deltaQa*Qa;
-dy(8)  = Ic*h*(1-alpha)*C*tau*S/N - deltasq*Sq; 
-dy(9)  = v*N*S/(S+R)-Sv*alpha*Cv*(1-epsilon)*(Ip+bc*Ic+ba*Ia)/N;
-dy(10) = Sv*alpha*Cv*(1-epsilon)*(Ip+bc*Ic+ba*Ia)/N - deltaIv*Iv;
-dy(11) = deltaIc*Ic+deltaIa*Ia+deltaQ*Q+ deltaQa*Qa-v*N*R/(S+R);
-dy(12) = deltaIv*Iv + v*N*R/(S+R);
->>>>>>> Stashed changes
