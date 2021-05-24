@@ -62,7 +62,7 @@ start = [s0;
          sv2];
         
 
-sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], start(:,1) ,[0 Tf]);
+sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], start ,[0 Tf]);
 
 % options = odeset('RelTol',1e-4,'AbsTol',1e-6);
 % [T,Y] = ode45(@CTeq, 0:1:Tf, [s0;e0;ip0;ic0;ia0;q0;sq0;sv0;iv0;re0;rv0], options);
