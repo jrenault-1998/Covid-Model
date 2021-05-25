@@ -12,7 +12,7 @@ C = 0.5/alpha;             %beta = alpha*C s.t. beta=0.75
 bc = 0.5;                   %reduction in contacts|symptomatic?
 ba = 0.75;
 q =0.8;                     %Contact tracing efficacy
-tau = 2;                    %Estimates time from entering Ic to CTing
+tau = 2;                  %Estimates time from entering Ic to CTing
 deltaE = 1/4;
 deltaIp = 1/2.4;
 deltaIc =1/3.2;             
