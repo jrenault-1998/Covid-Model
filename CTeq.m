@@ -33,7 +33,7 @@ dy = zeros(11,1);
 
 
 
-if Sv1 + Iv1 + Iv2 + Sv2 > vmax             %Vaccination stops at %population
+if Sv1 + Iv1 + Iv2 + Sv2 > vmax             %Vaccination stops at %population eligible
     v=0;
 end
 
