@@ -14,7 +14,7 @@ ba = 0.75;
 q =0.8;                     %Contact tracing efficacy
 tau = 2;                  %Estimates time from entering Ic to CTing
 deltaE = 1/4;
-deltaIp = 1/2.4;
+deltaIp = 1/3;           %2.4days is right, but needs to be whole number
 deltaIc =1/3.2;             
 deltaIa = 1/7;
 deltaSq = 1/10;              %How long are people told to isolate for?
@@ -35,8 +35,8 @@ Tf = 120;                    %days of simulation
 
 sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], @history ,[0 Tf]);
 figure;
-plot(sol.x,sol.y(1,:))
-title('S');
+plot(sol.x,sol.y(3,:))
+title('Ip');
 xlabel('time t');
 ylabel('% Population');
 

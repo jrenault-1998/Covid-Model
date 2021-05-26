@@ -73,11 +73,9 @@ dy(9)  = Sv1*alpha*Cv*(1-epsilon1)*(Ip+bc*Ic+ba*Ia)/N - deltaIv*Iv1;
 %Iv2                %From Sv2                            %To Sv2
 dy(10) = Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N - deltaIv*Iv1;
 
-%R       %From Ic      %From Ia    %From Q   %Got Vaccine
+%R       %From Ic
 dy(11) = deltaIc*Ic + deltaIa*Ia + deltaQ*Q - v*N*R/(S+R);
-
-%Sv2      %------Vaccine & Recovered--------        %2nd Dose     %To Iv2
-dy(12) = v*N*R/(S+R) + deltaIv*Iv1 + deltaIv*Iv2 + deltaSv1*Sv1 - Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N;
+dy(12) = v*N*R/(S+R) + deltaIv*Iv1 + deltaSv1*Sv1 + deltaIv*Iv2 - Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N;
 
 
 
