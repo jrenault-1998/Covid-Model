@@ -5,17 +5,17 @@ clc
 
 
 %model parameters
-global alpha C bc ba q deltaE deltaIc deltaIa r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf
+global alpha C bc ba q0 deltaE deltaIc deltaIa r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf
 
 alpha = 0.18;
-C = 0.5/alpha;             %beta = alpha*C s.t. beta=0.75
+C = 0.75/alpha;             %beta = alpha*C s.t. beta=0.75
 bc = 0.5;                   %reduction in contacts|symptomatic?
 ba = 0.75;
-q =0.8;                     %Contact tracing efficacy
+q0 =1;                     %Contact tracing efficacy
 tau = 2;                  %Estimates time from entering Ic to CTing
 deltaE = 1/4;
 deltaIp = 1/3;           %2.4days is right, but needs to be whole number
-deltaIc =1/3.2;             
+deltaIc = 1/3.2;             
 deltaIa = 1/7;
 deltaSq = 1/10;              %How long are people told to isolate for?
 deltaIv = 1/5;               %Average time spent infectious|vaccinated?
@@ -35,8 +35,8 @@ Tf = 120;                    %days of simulation
 
 sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], @history ,[0 Tf]);
 figure;
-plot(sol.x,sol.y(3,:))
-title('Ip');
+plot(sol.x,sol.y(1,:))
+title('S');
 xlabel('time t');
 ylabel('% Population');
 

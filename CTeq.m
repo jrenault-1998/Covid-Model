@@ -1,6 +1,6 @@
 function dy = CTeq(t,y, Z)
 
-global alpha C bc ba q deltaE deltaIp deltaIc deltaIa deltaQ r epsilon1 epsilon2 Cv  v deltaSq deltaSv1 deltaIv N vmax vstop 
+global alpha C bc ba q0 deltaE deltaIp deltaIc deltaIa deltaQ r epsilon1 epsilon2 Cv  v deltaSq deltaSv1 deltaIv N vmax vstop 
 
 ylag1 = Z(:,1);     %For Z(:,i), these values are t-i days before
 ylag2 = Z(:,2);
@@ -36,6 +36,14 @@ dy = zeros(11,1);
 if Sv1 + Iv1 + Iv2 + Sv2 > vmax             %Vaccination stops at %population eligible
     v=0;
 end
+
+
+function q = qexp(Ic)
+q = q0*exp(-1.65*10^(-3)*Ic);
+
+end
+
+q = qexp(Ic);
 
 
 if Sv1 + Iv1 + Iv2 + Sv2 > vstop            %Contact tracing stops at %population vaccinated
@@ -82,4 +90,4 @@ dy(12) = v*N*R/(S+R) + deltaIv*Iv1 + deltaIv*Iv2 + deltaSv1*Sv1 - Sv2*alpha*Cv*(
 
 
 
-
+end
