@@ -7,8 +7,8 @@ clc
 %model parameters
 global alpha C bc ba q0 deltaE deltaIc deltaIa r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf
 
-alpha = 0.18;
-C = 0.75/alpha;             %beta = alpha*C s.t. beta=0.75
+alpha = 0.4;
+C = 20;             %beta = alpha*C s.t. beta=0.75 and alpha=0.18
 bc = 0.5;                   %reduction in contacts|symptomatic?
 ba = 0.75;
 q0 =1;                     %Contact tracing efficacy
@@ -35,8 +35,8 @@ Tf = 120;                    %days of simulation
 
 sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], @history ,[0 Tf]);
 figure;
-plot(sol.x,sol.y(1,:))
-title('S');
+plot(sol.x,sol.y(4,:))
+title('Ic');
 xlabel('time t');
 ylabel('% Population');
 
@@ -45,11 +45,11 @@ ylabel('% Population');
 function s = history(t)
 % Constant history function for CTeq.
 totalpop = 5.2e5;      %Population of Newfoundland
-s0=1-(3/(totalpop));
+s0=1-(1/(totalpop));
 e0=0;
-ip0=1/(totalpop); %Infectious, Presymptomatic
-ic0=1/(totalpop);
-ia0=1/(totalpop);
+ip0=2/(totalpop); %Infectious, Presymptomatic
+ic0=0;
+ia0=0;
 q0=0;
 sq0=0;
 sv1=0;
