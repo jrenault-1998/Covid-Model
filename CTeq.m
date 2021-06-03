@@ -79,7 +79,7 @@ dy(8)  = v*N*S/(S+R) - Sv1*alpha*Cv*(1-epsilon1)*(Ip+bc*Ic+ba*Ia)/N - deltaSv1*S
 dy(9)  = Sv1*alpha*Cv*(1-epsilon1)*(Ip+bc*Ic+ba*Ia)/N - deltaIv*Iv1;
 
 %Iv2                %From Sv2                            %To Sv2
-dy(10) = Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N - deltaIv*Iv1;
+dy(10) = Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N - deltaIv*Iv2;
 
 %R       %From Ic      %From Ia    %From Q   %Got Vaccine
 dy(11) = deltaIc*Ic + deltaIa*Ia + deltaQ*Q - v*N*R/(S+R);

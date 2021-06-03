@@ -7,15 +7,15 @@ clc
 %model parameters
 global alpha C bc ba q0 deltaE deltaIc deltaIa r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf
 
-alpha = 0.18;
-C = 6;                    %Error for large c and small alpha
+alpha = 1;
+C = 4.16666;              %Error for large c and small alpha
 bc = 0.5;                 %reduction in contacts|symptomatic?
 ba = 0.75;
 q0 =1;                    %Contact tracing efficacy
 tau = 2;                  %Estimates time from entering Ic to CTing
 deltaE = 1/4;
 deltaIp = 1/3;            %2.4days is right, but needs to be whole number
-deltaIc = 1/3.2;             
+deltaIc = 1/3.2;          %1/3.2
 deltaIa = 1/7;
 deltaSq = 1/10;              %How long are people told to isolate for?
 deltaIv = 1/5;               %Average time spent infectious|vaccinated?
@@ -35,7 +35,7 @@ Tf = 120;                    %days of simulation
 
 sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], @history ,[0 Tf]);
 figure;
-plot(sol.x,sol.y(4,:)*totalpop)
+plot(sol.x,sol.y(4,:))
 title('Ic');
 xlabel('time t');
 ylabel('Population');
@@ -45,9 +45,9 @@ ylabel('Population');
 function s = history(t)
 % Constant history function for CTeq.
 totalpop = 5.2e5;      %Population of Newfoundland
-s0=1-(1/(totalpop));
+s0=1-(5/(totalpop));
 e0=0;
-ip0=1/(totalpop); %Infectious, Presymptomatic
+ip0=5/(totalpop); %Infectious, Presymptomatic
 ic0=0;
 ia0=0;
 q0=0;
