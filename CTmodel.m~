@@ -27,10 +27,10 @@ epsilon2 = 0.8;             % (unitless)
 Cv = C + 0.5;                %increase by some constant? (1/day)
 v = 0.06/7;                  %0.06 of pop. every week  (unitless)
 N = 1;                      %(people)
-totalpop = 5.2e5;            %Population of Newfoundland     (people)    
-vmax = 462000/totalpop;      %# of people eligible for vaccine  (unitless)
-vstop = 0.5;                 %stop CTing when vstop people are vaccinated (unitless)
-Tf = 120;                    %days of simulation (days)
+totalpop = 5.2e5;            %Population of Newfoundland         
+vmax = 462000/totalpop;      %# of people eligible for vaccine
+vstop = 0.5;                 %stop CTing when vstop people are vaccinated
+Tf = 120;                    %days of simulation
 
 
 sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], @history ,[0 Tf]);
