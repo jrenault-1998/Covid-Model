@@ -7,8 +7,8 @@ clc
 %model parameters
 global alpha C bc ba q0 deltaE deltaIc deltaIa r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim
 
-alpha = 1;                  %(probability -> unitless)
-C = 4.16666;              %Error for large c and small alpha   (1/day)
+alpha = 0.18;                  %(probability -> unitless)
+C = 5;              %Error for large c and small alpha   (1/day)
 bc = 0.5;                 %reduction in contacts|symptomatic?  (unitless)
 ba = 0.75;                %reduction in infectiousness         (unitless)
 q0 =1;                    %Contact tracing efficacy            (unitless)
