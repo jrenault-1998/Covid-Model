@@ -5,13 +5,14 @@ clc
 
 
 %model parameters
-global alpha C bc ba q0 deltaE deltaIc deltaIa r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf
+global alpha C bc ba q0 deltaE deltaIc deltaIa r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim
 
 alpha = 1;                  %(probability -> unitless)
 C = 4.16666;              %Error for large c and small alpha   (1/day)
 bc = 0.5;                 %reduction in contacts|symptomatic?  (unitless)
 ba = 0.75;                %reduction in infectiousness         (unitless)
 q0 =1;                    %Contact tracing efficacy            (unitless)
+Iclim = 5;
 tau = 2;                  %Estimates time from entering Ic to CTing  (days)
 deltaE = 1/4;             %All "deltaX" terms are (1/days)
 deltaIp = 1/3;            %2.4days is right, but needs to be whole number
@@ -25,11 +26,11 @@ r = 0.7;                    % (unitless)
 epsilon1 = 0.6;             % (unitless)
 epsilon2 = 0.8;             % (unitless)
 Cv = C + 0.5;                %increase by some constant? (1/day)
-v = 0.06/7;                  %0.06 of pop. every week  (1/day)
+v = 0.06/7;                  %0.06 of pop. every week  (unitless)
 N = 1;                      %(people)
 totalpop = 5.2e5;            %Population of Newfoundland     (people)    
-vmax = 462000/totalpop;      %# of people eligible for vaccine  (people)
-vstop = 0.5;                 %stop CTing when vstop people are vaccinated (people)
+vmax = 462000/totalpop;      %# of people eligible for vaccine  (unitless)
+vstop = 0.5;                 %stop CTing when vstop people are vaccinated (unitless)
 Tf = 120;                    %days of simulation (days)
 
 
