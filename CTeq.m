@@ -38,6 +38,14 @@ if Sv1 + Iv1 + Iv2 + Sv2 > vmax             %Vaccination stops at %population el
 end
 
 
+function q = qtan(Ic)
+q = 2/pi*(atan(100*Ic-Iclim*100) + pi/2);
+
+end
+
+q = qtan(Ic);
+
+
 
 %if Sv1 + Iv1 + Iv2 + Sv2 > vstop            %Contact tracing stops at %population vaccinated
  %   
@@ -45,25 +53,25 @@ end
 
 
 %S            %Exposed                                    %Contact Traced
-dy(1)  = -S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (E5*r*deltaE)*(2/pi*(atan(100*Ic-Iclim*100) + pi/2))*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4) - v*N*S/(S+R) + deltaSq*Sq;
+dy(1)  = -S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (E5*r*deltaE)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4) - v*N*S/(S+R) + deltaSq*Sq;
 
 %E            %From S                                     %Contact Traced
-dy(2)  = S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (E5*r*deltaE)*(2/pi*(atan(100*Ic-Iclim*100) + pi/2))*alpha*C*(bc*(S+S1)+S2+S3) - deltaE*E;
+dy(2)  = S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (E5*r*deltaE)*q*alpha*C*(bc*(S+S1)+S2+S3) - deltaE*E;
 
 %Ip       %From E                %Contact Traced        %To Ic
-dy(3)  = r*deltaE*E - (E5*r*deltaE)*r*(2/pi*(atan(100*Ic-Iclim*100) + pi/2))*alpha*C*(S4) - deltaIp*Ip;
+dy(3)  = r*deltaE*E - (E5*r*deltaE)*r*q*alpha*C*(S4) - deltaIp*Ip;
 
 %Ic                     %To R
 dy(4)  = deltaIp*Ip - deltaIc*Ic;
 
 %Ia        %From E               %Contact Traced                %To R
-dy(5)  = (1-r)*deltaE*E - (E5*r*deltaE)*(1-r)*(2/pi*(atan(100*Ic-Iclim*100) + pi/2))*alpha*C*(S4) - deltaIa*Ia;
+dy(5)  = (1-r)*deltaE*E - (E5*r*deltaE)*(1-r)*q*alpha*C*(S4) - deltaIa*Ia;
 
 %Q                 %From E, Ip and Ia                    %To R
-dy(6)  = (E5*r*deltaE)*(2/pi*(atan(100*Ic-Iclim*100) + pi/2))*alpha*C*(bc*(S+S1)+S2+S3+S4) - deltaQ*Q;
+dy(6)  = (E5*r*deltaE)*q*alpha*C*(bc*(S+S1)+S2+S3+S4) - deltaQ*Q;
 
 %Sq                %From S                                    %To S
-dy(7)  = (E5*r*deltaE)*(2/pi*(atan(100*Ic-Iclim*100) + pi/2))*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4) - deltaSq*Sq; 
+dy(7)  = (E5*r*deltaE)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4) - deltaSq*Sq; 
 
 %Sv1     %From S                 %To Iv1                            %To Sv2
 dy(8)  = v*N*S/(S+R) - Sv1*alpha*Cv*(1-epsilon1)*(Ip+bc*Ic+ba*Ia)/N - deltaSv1*Sv1;
