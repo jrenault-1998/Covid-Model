@@ -1,6 +1,6 @@
 function dy = CTeq(t,y, Z)
 
-global alpha C bc ba deltaE deltaIp deltaIc deltaIa deltaQ r epsilon1 epsilon2 Cv  v deltaSq deltaSv1 deltaIv N vmax vstop Iclim q0
+global alpha C bc ba deltaE deltaIp deltaIc deltaIa deltaQ totalpop r epsilon1 epsilon2 Cv  v deltaSq deltaSv1 deltaIv N vmax vstop Iclim q0
 
 ylag1 = Z(:,1);     %For Z(:,i), these values are t-i days before
 ylag2 = Z(:,2);
@@ -39,11 +39,18 @@ end
 
 
 function q = qtan(Ic)
-q = 2/pi*(atan(100*Ic-Iclim*100) + pi/2);
-
+  if Ic < 420/totalpop
+      q = 2/pi*(atan(1000*Ic));
+      
+  else
+      q = 0.1;
+      
+  end
 end
 
 q = qtan(Ic);
+
+disp(q);
 
 
 

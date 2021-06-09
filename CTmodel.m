@@ -5,9 +5,9 @@ clc
 
 
 %model parameters
-global alpha C bc ba q0 deltaE deltaIc deltaIa r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim
+global alpha C bc ba q0 deltaE deltaIc deltaIa totalpop r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim
 
-alpha = 0.3;                  %(probability -> unitless)
+alpha = 0.18;                  %(probability -> unitless)
 C = 5;              %Error for large c and small alpha   (1/day)
 bc = 0.5;                 %reduction in contacts|symptomatic?  (unitless)
 ba = 0.75;                %reduction in infectiousness         (unitless)
@@ -36,8 +36,16 @@ Tf = 120;                    %days of simulation (days)
 
 sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], @history ,[0 Tf]);
 figure;
-plot(sol.x,sol.y(6,:))
-title('Q');
+plot(sol.x,sol.y(3,:)+ sol.y(4,:)+ sol.y(5,:), 'k')
+hold on
+plot(sol.x,sol.y(1,:), 'g')
+hold on
+plot(sol.x,sol.y(11,:), 'm')
+hold on
+plot(sol.x,(sol.y(6,:) + sol.y(7,:)), 'r')
+hold on
+plot(sol.x,(sol.y(8,:) + sol.y(9,:)+ sol.y(10,:)+ sol.y(12,:)), 'y')
+title('Quarartine(r), S(g), I(k), Vaccinated(y), R(m)');
 xlabel('time t');
 ylabel('Population');
 
