@@ -5,14 +5,14 @@ clc
 
 
 %model parameters
-global alpha C bc ba q0 deltaE deltaIc deltaIa totalpop r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim
+global alpha C bc ba q0 deltaE deltaIc deltaIa totalpop r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim tau
 
 alpha = 0.18;                  %(probability -> unitless)
 C = 5;              %Error for large c and small alpha   (1/day)
 bc = 0.5;                 %reduction in contacts|symptomatic?  (unitless)
 ba = 0.75;                %reduction in infectiousness         (unitless)
 q0 =1;                    %Contact tracing efficacy            (unitless)
-Iclim = 5;
+Iclim = 4;
 tau = 2;                  %Estimates time from entering Ic to CTing  (days)
 deltaE = 1/4;             %All "deltaX" terms are (1/days)
 deltaIp = 1/3;            %2.4days is right, but needs to be whole number

@@ -38,9 +38,13 @@ if Sv1 + Iv1 + Iv2 + Sv2 > vmax             %Vaccination stops at %population el
 end
 
 
+steepness = 5;
+shift = 1/2;
+
+
 function q = qtan(Ic)
   if Ic < 420/totalpop
-      q = 2/pi*(atan(1000*Ic));
+      q = (1/pi)*(atan(steepness*(Ic*totalpop-Iclim)))+shift;
       
   else
       q = 0.1;
@@ -51,7 +55,6 @@ end
 q = qtan(Ic);
 
 disp(q);
-
 
 
 %if Sv1 + Iv1 + Iv2 + Sv2 > vstop            %Contact tracing stops at %population vaccinated
