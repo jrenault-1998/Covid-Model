@@ -41,6 +41,16 @@ end
 steepness = 5;
 shift = 1/2;
 
+function Iclim = Iclimit(Ic)
+  if Ic > 20/totalpop
+      Iclim = 0;
+      
+  else
+      
+  end
+end
+
+Iclim = Iclimit(Ic);
 
 function q = qtan(Ic)
   if Ic < 420/totalpop
@@ -51,6 +61,8 @@ function q = qtan(Ic)
       
   end
 end
+
+
 
 q = qtan(Ic);
 
