@@ -5,13 +5,13 @@ clc
 
 
 %model parameters
-global alpha C bc ba q0 deltaE deltaIc deltaIa totalpop r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim tau
+global alpha C bc ba deltaE deltaIc deltaIa totalpop r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim tau
+global CT_break
 
-alpha = 0.18;                  %(probability -> unitless)
-C = 5;              %Error for large c and small alpha   (1/day)
+alpha = 0.4;              %(probability -> unitless)
+C = 7;                    %Error for large c and small alpha   (1/day)
 bc = 0.5;                 %reduction in contacts|symptomatic?  (unitless)
 ba = 0.75;                %reduction in infectiousness         (unitless)
-q0 =1;                    %Contact tracing efficacy            (unitless)
 Iclim = 4;
 tau = 2;                  %Estimates time from entering Ic to CTing  (days)
 deltaE = 1/4;             %All "deltaX" terms are (1/days)
@@ -33,13 +33,14 @@ vmax = 462000/totalpop;      %# of people eligible for vaccine  (unitless)
 vstop = 0.5;                 %stop CTing when vstop people are vaccinated (unitless)
 Tf = 120;                    %days of simulation (days)
 
+CT_break = 420;              %Pop in Ic when CTing breaks down
+CT_max = 
+
 
 sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], @history ,[0 Tf]);
 
 
 figure(1);
-plot(sol.x,sol.y(3,:)+ sol.y(4,:)+ sol.y(5,:), 'k')
-hold on
 plot(sol.x,sol.y(1,:), 'g')
 hold on
 plot(sol.x,sol.y(11,:), 'm')
@@ -47,10 +48,9 @@ hold on
 plot(sol.x,(sol.y(6,:) + sol.y(7,:)), 'r')
 hold on
 plot(sol.x,(sol.y(8,:) + sol.y(9,:)+ sol.y(10,:)+ sol.y(12,:)), 'y')
-title('Quarartine(r), S(g), I(k), Vaccinated(y), R(m)');
-legend('I_p','I_c','I_a','I_p + I_c + I_a','Location','Best')
-xlabel('time t');
-ylabel('Population');
+legend('S','R','Quarantine','Vaccinated','Location','Best')
+xlabel('time [days]');
+ylabel('% Population');
 
 
 figure(2);

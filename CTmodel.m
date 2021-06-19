@@ -6,6 +6,7 @@ clc
 
 %model parameters
 global alpha C bc ba deltaE deltaIc deltaIa totalpop r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim tau
+global CT_break CT_max
 
 alpha = 0.4;              %(probability -> unitless)
 C = 7;                    %Error for large c and small alpha   (1/day)
@@ -31,6 +32,9 @@ totalpop = 5.2e5;            %Population of Newfoundland     (people)
 vmax = 462000/totalpop;      %# of people eligible for vaccine  (unitless)
 vstop = 0.5;                 %stop CTing when vstop people are vaccinated (unitless)
 Tf = 120;                    %days of simulation (days)
+
+CT_break = 420;              %Pop in Ic when CTing breaks down
+CT_max = 450;                %Pop in Ic when CTing bottoms out
 
 
 sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], @history ,[0 Tf]);
