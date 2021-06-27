@@ -8,11 +8,11 @@ clc
 global alpha C bc ba deltaE deltaIc deltaIa totalpop r epsilon1 epsilon2 Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim tau
 global CT_break CT_max
 
-alpha = 0.4;              %(probability -> unitless)
-C = 7;                    %Error for large c and small alpha   (1/day)
+alpha = 0.3;              %(probability -> unitless)
+C = 6;                    %Error for large c and small alpha   (1/day)
 bc = 0.5;                 %reduction in contacts|symptomatic?  (unitless)
 ba = 0.75;                %reduction in infectiousness         (unitless)
-Iclim = 4;
+Iclim = 5;
 tau = 2;                  %Estimates time from entering Ic to CTing  (days)
 deltaE = 1/4;             %All "deltaX" terms are (1/days)
 deltaIp = 1/3;            %2.4days is right, but needs to be whole number
@@ -27,17 +27,17 @@ epsilon1 = 0.6;             % (unitless)
 epsilon2 = 0.8;             % (unitless)
 Cv = C + 0.5;                %increase by some constant? (1/day)
 v = 0.06/7;                  %0.06 of pop. every week  (unitless)
-N = 1;                      %(people)
+N = 5.2e5;                   %(people)
 totalpop = 5.2e5;            %Population of Newfoundland     (people)    
-vmax = 462000/totalpop;      %# of people eligible for vaccine  (unitless)
+vmax = 462000;               %# of people eligible for vaccine  (unitless)
 vstop = 0.5;                 %stop CTing when vstop people are vaccinated (unitless)
-Tf = 120;                    %days of simulation (days)
+Tf = 70;                    %days of simulation (days)
 
 CT_break = 420;              %Pop in Ic when CTing breaks down
 CT_max = 450;                %Pop in Ic when CTing bottoms out
 
 
-sol = dde23(@CTeq,[1, 2, 3, 4, 5, 6], @history ,[0 Tf]);
+sol = dde23(@CTeq,[1, 2, 3, 4, 5], @history ,[0 Tf]);
 
 
 figure(1);
@@ -50,7 +50,7 @@ hold on
 plot(sol.x,(sol.y(8,:) + sol.y(9,:)+ sol.y(10,:)+ sol.y(12,:)), 'y')
 legend('S','R','Quarantine','Vaccinated','Location','Best')
 xlabel('time [days]');
-ylabel('% Population');
+ylabel('Population');
 
 
 figure(2);
@@ -71,11 +71,10 @@ ylabel('Active cases');
 
 function s = history(t)
 % Constant history function for CTeq.
-totalpop = 5.2e5;      %Population of Newfoundland
-s0=1-(5/(totalpop));
+s0=5.2e5;
 e0=0;
-ip0=5/(totalpop); %Infectious, Presymptomatic
-ic0=0;
+ip0=0; %Infectious, Presymptomatic
+ic0=1;
 ia0=0;
 q0=0;
 sq0=0;

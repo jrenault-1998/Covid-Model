@@ -40,65 +40,60 @@ if Sv1 + Iv1 + Iv2 + Sv2 > vmax             %Vaccination stops at %population el
 end
 
 
-steepness = 5;
-shift = 1/2;
-
-function Iclim0 = Iclimit(Ic)
-  if Ic > 20/totalpop
-      Iclim0 = 0.1;
-      
-  else 
-      
-      Iclim0 = Iclim;
-  end
+if (Ic > Iclim)  
+    Iclim = 0;
 end
 
-Iclim = Iclimit(Ic);
+
+steepness = 5;
+shift = 0.487;
 
 function q = qtan(Ic)
-  if Ic*totalpop < CT_break
-      q = (1/pi)*(atan(steepness*(Ic*totalpop-Iclim)))+shift;
+  if Ic < CT_break
+      q = (1/pi)*(atan(steepness*(Ic-Iclim)))+shift;
       
   else
-      q = ((1/pi)*(atan(steepness*(Ic*totalpop-Iclim)))+shift)*exp(-(Ic*totalpop - CT_break));
+      q = ((1/pi)*(atan(steepness*(Ic-Iclim)))+shift)*exp(-(Ic - CT_break));
       
   end
 end
 
 
-
+D = E5*r*deltaE;
 q = qtan(Ic);
 
-disp(q);
-
-% 
-% if Sv1 + Iv1 + Iv2 + Sv2 > vstop            %Contact tracing stops at %population vaccinated
-%     q = 0;
-% else
-%     
+% if (D > Ic)
+%    D = 0;
 % end
 
 
+% 
+% if (Sv1 + Iv1 + Iv2 + Sv2 > vstop)            %Contact tracing stops at %population vaccinated
+%     q = 0;    
+% end
+
+
+
 %S            %Exposed                                    %Contact Traced
-dy(1)  = -S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (E5*r*deltaE)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4) - v*N*S/(S+R) + deltaSq*Sq;
+dy(1)  = -S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/N - v*N*S/(S+R) + deltaSq*Sq;
 
 %E            %From S                                     %Contact Traced
-dy(2)  = S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (E5*r*deltaE)*q*alpha*C*(bc*(S+S1)+S2+S3) - deltaE*E;
+dy(2)  = S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (D)*q*alpha*C*(bc*(S+S1)+S2+S3)/N - deltaE*E;
 
 %Ip       %From E                %Contact Traced        %To Ic
-dy(3)  = r*deltaE*E - (E5*r*deltaE)*r*q*alpha*C*(S4) - deltaIp*Ip;
+dy(3)  = r*deltaE*E - (D)*r*q*alpha*C*(S4)/N - deltaIp*Ip;
 
 %Ic                     %To R
-dy(4)  = deltaIp*Ip - deltaIc*Ic;
+dy(4)  = deltaIp*Ip - deltaIc*Ic - D*q;
 
 %Ia        %From E               %Contact Traced                %To R
-dy(5)  = (1-r)*deltaE*E - (E5*r*deltaE)*(1-r)*q*alpha*C*(S4) - deltaIa*Ia;
+dy(5)  = (1-r)*deltaE*E - (D)*(1-r)*q*alpha*C*(S4)/N - deltaIa*Ia;
 
 %Q                 %From E, Ip and Ia                    %To R
-dy(6)  = (E5*r*deltaE)*q*alpha*C*(bc*(S+S1)+S2+S3+S4) - deltaQ*Q;
+dy(6)  = (D)*q*alpha*C*(bc*(S+S1)+S2+S3+S4)/N + D - deltaQ*Q;
 
 %Sq                %From S                                    %To S
-dy(7)  = (E5*r*deltaE)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4) - deltaSq*Sq; 
+dy(7)  = (D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/N - deltaSq*Sq; 
 
 %Sv1     %From S                 %To Iv1                            %To Sv2
 dy(8)  = v*N*S/(S+R) - Sv1*alpha*Cv*(1-epsilon1)*(Ip+bc*Ic+ba*Ia)/N - deltaSv1*Sv1;
@@ -114,8 +109,6 @@ dy(11) = deltaIc*Ic + deltaIa*Ia + deltaQ*Q - v*N*R/(S+R);
 
 %Sv2      %------Vaccine & Recovered--------        %2nd Dose     %To Iv2
 dy(12) = v*N*R/(S+R) + deltaIv*Iv1 + deltaIv*Iv2 + deltaSv1*Sv1 - Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N;
-
-
 
 
 end
