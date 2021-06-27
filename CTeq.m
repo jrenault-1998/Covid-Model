@@ -90,7 +90,7 @@ dy(4)  = deltaIp*Ip - deltaIc*Ic - D*q;
 dy(5)  = (1-r)*deltaE*E - (D)*(1-r)*q*alpha*C*(S4)/N - deltaIa*Ia;
 
 %Q                 %From E, Ip and Ia                    %To R
-dy(6)  = (D)*q*alpha*C*(bc*(S+S1)+S2+S3+S4)/N + D - deltaQ*Q;
+dy(6)  = (D)*q*alpha*C*(bc*(S+S1)+S2+S3+S4)/N + q*D - deltaQ*Q;
 
 %Sq                %From S                                    %To S
 dy(7)  = (D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/N - deltaSq*Sq; 
