@@ -75,9 +75,9 @@ ylabel('Active cases');
 function s = history(t)
 % Constant history function for CTeq.
 s0=5.2e5;
-e0=1;
+e0=0;
 ip0=0; %Infectious, Presymptomatic
-ic0=0;
+ic0=1;
 ia0=0;
 q0=0;
 sq0=0;
@@ -86,9 +86,8 @@ iv1=0;
 iv2=0;
 r0=0;
 sv2=0;
-e1=0;
 
-s = [s0; e0; ip0; ic0; ia0; q0; sq0; sv1; iv1; iv2; r0; sv2; e1];
+s = [s0; e0; ip0; ic0; ia0; q0; sq0; sv1; iv1; iv2; r0; sv2];
 end
         
 

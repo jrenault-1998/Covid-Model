@@ -1,7 +1,7 @@
 function dy = CTeq(t,y, Z)
 
 global alpha C bc ba deltaE deltaIp deltaIc deltaIa deltaQ totalpop r epsilon1 epsilon2 Cv  v deltaSq deltaSv1 deltaIv N vmax vstop Iclim
-global CT_break CT_max
+global CT_break CT_max q0 q02
 
 
 ylag1 = Z(:,1);     %For Z(:,i), these values are t-i days before
@@ -45,21 +45,32 @@ if (Ic > Iclim)
 end
 
 
-steepness = 5;
-shift = 0.487;
+steepness = 100;
+shift = pi/2;
 
 function q = qtan(Ic)
   if Ic < CT_break
-      q = (1/pi)*(atan(steepness*(Ic-Iclim)))+shift;
+      q = q0*(1/pi*(atan(steepness*(Ic-Iclim))+shift));
       
   else
-      q = ((1/pi)*(atan(steepness*(Ic-Iclim)))+shift)*exp(-(Ic - CT_break));
+      q = q0*(1/pi*(atan(steepness*(Ic-Iclim))+shift))*exp(-(1/10)*(Ic - CT_break));
       
   end
 end
 
 
-D = E5*r*deltaE;
+% steepness = 100; 
+% shift = pi/2; 
+% Iclim = 10;
+% CT_break = 420;
+% Ic = CT_break:0.1:(CT_break + 100); 
+% q = q0*(1/pi*(atan(steepness*(Ic-Iclim))+shift)).*exp(-(1/10)*(Ic - CT_break));
+% figure;
+% plot(Ic,q)
+
+
+
+D = q02*E5*r*deltaE;
 q = qtan(Ic);
 
 % if (D > Ic)
@@ -110,5 +121,7 @@ dy(11) = deltaIc*Ic + deltaIa*Ia + deltaQ*Q - v*N*R/(S+R);
 %Sv2      %------Vaccine & Recovered--------        %2nd Dose     %To Iv2
 dy(12) = v*N*R/(S+R) + deltaIv*Iv1 + deltaIv*Iv2 + deltaSv1*Sv1 - Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N;
 
+
+dy(13) = deltaE*E;
 
 end
