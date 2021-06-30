@@ -25,7 +25,7 @@ r = 0.7;                    % (unitless)
 epsilon1 = 0.6;             % (unitless)
 epsilon2 = 0.8;             % (unitless)
 Cv = C + 0.5;                %increase by some constant? (1/day)
-v = 0; %0.06/7;                  %0.06 of pop. every week  (unitless)
+v = 0.06/7;                  %0.06 of pop. every week  (unitless)
 N = 5.2e5;                   %(people)
 totalpop = 5.2e5;            %Population of Newfoundland     (people)    
 vmax = 462000;               %# of people eligible for vaccine  (unitless)
@@ -75,9 +75,9 @@ ylabel('Active cases');
 function s = history(t)
 % Constant history function for CTeq.
 s0=5.2e5;
-e0=1;
+e0=0;
 ip0=0; %Infectious, Presymptomatic
-ic0=0;
+ic0=1;
 ia0=0;
 q0=0;
 sq0=0;
