@@ -49,13 +49,13 @@ steepness = 100;
 shift = pi/2;
 
 function q = qtan(Ic)
-  if Ic < CT_break
+%  if Ic < CT_break
       q = q0*(1/pi*(atan(steepness*(Ic-Iclim))+shift));
       
-  else
-      q = q0*(1/pi*(atan(steepness*(Ic-Iclim))+shift))*exp(-(1/10)*(Ic - CT_break));
+%  else
+ %     q = q0*(1/pi*(atan(steepness*(Ic-Iclim))+shift))*exp(-(1/10)*(Ic - CT_break));
       
-  end
+ % end
 end
 
 
