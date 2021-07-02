@@ -9,7 +9,7 @@ global alpha C bc ba deltaE deltaIc deltaIa totalpop r epsilon1 epsilon2 ...
     Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim tau q0 q02 %CT_break CT_max 
 
 alpha = 0.18;             %(probability -> unitless)
-C = 4;                    %Error for large c and small alpha   (1/day)
+C = 5;                    %Error for large c and small alpha   (1/day)
 bc = 0.5;                 %reduction in contacts|symptomatic?  (unitless)
 ba = 0.75;                %reduction in infectiousness         (unitless)
 tau = 2;                  %Estimates time from entering Ic to CTing  (days)
