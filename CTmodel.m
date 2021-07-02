@@ -28,6 +28,9 @@ N = 5.2e5;                   %(people)
 totalpop = 5.2e5;            %Population of Newfoundland     (people)    
 vmax = 462000;               %# of people eligible for vaccine  (unitless)
 vstop = 0.5;                 %stop CTing when vstop people are vaccinated (unitless)
+q0 = 0.9;
+q02 = 0.9;
+Iclim = 3;
 
 
 %Need to put this a little high
@@ -125,20 +128,6 @@ xlabel('Iclim [Ic when CT starts]')
 set(gca,'fontsize',14)
 set(gca,'YDir','normal')  
 
-
-
-%% Plots S, Q and Ic in standard 2D lines
-Iclim = 5;
-sol = dde23(@CTeq,[1, 2, 3, 4, 5], s,[0 Tf]);
-figure(2);
-plot(sol.x,sol.y(4,:), 'g')
-hold on
-plot(sol.x,sol.y(1,:), 'm')
-hold on
-plot(sol.x,(sol.y(6,:)), 'r')
-legend('Ic','S','Quarantine','Location','Best')
-xlabel('time [days]');
-ylabel('Population');
 
 
 
