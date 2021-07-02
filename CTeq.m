@@ -1,7 +1,7 @@
 function dy = CTeq(t,y, Z)
 
-global alpha C bc ba deltaE deltaIp deltaIc deltaIa deltaQ totalpop r epsilon1 epsilon2 Cv  v deltaSq deltaSv1 deltaIv N vmax vstop Iclim
-global CT_break CT_max q0 q02
+global alpha C bc ba deltaE deltaIp deltaIc deltaIa deltaQ r epsilon1 epsilon2 Cv  v deltaSq deltaSv1 deltaIv N vmax Iclim ...
+ q0 q02 m
 
 
 ylag1 = Z(:,1);     %For Z(:,i), these values are t-i days before
@@ -45,7 +45,7 @@ if (Ic > Iclim)
 end
 
 
-steepness = 100;
+steepness = 1000;
 shift = pi/2;
 
 function q = qtan(Ic)
@@ -92,13 +92,13 @@ dy(1)  = -S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/
 dy(2)  = S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (D)*q*alpha*C*(bc*(S+S1)+S2+S3)/N - deltaE*E;
 
 %Ip       %From E                %Contact Traced        %To Ic
-dy(3)  = r*deltaE*E - (D)*r*q*alpha*C*(S4)/N - deltaIp*Ip;
+dy(3)  = r*deltaE*E - (D)*r*q*alpha*C*(S4)/N - deltaIp*Ip + r*m;
 
 %Ic                     %To R
-dy(4)  = deltaIp*Ip - deltaIc*Ic - D*q;
+dy(4)  = deltaIp*Ip - deltaIc*Ic - q*D;
 
 %Ia        %From E               %Contact Traced                %To R
-dy(5)  = (1-r)*deltaE*E - (D)*(1-r)*q*alpha*C*(S4)/N - deltaIa*Ia;
+dy(5)  = (1-r)*deltaE*E - (D)*(1-r)*q*alpha*C*(S4)/N - deltaIa*Ia + (1-r)*m;
 
 %Q                 %From E, Ip and Ia                    %To R
 dy(6)  = (D)*q*alpha*C*(bc*(S+S1)+S2+S3+S4)/N + q*D - deltaQ*Q;

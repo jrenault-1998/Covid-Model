@@ -6,10 +6,10 @@ clc
 
 %model parameters
 global alpha C bc ba deltaE deltaIc deltaIa totalpop r epsilon1 epsilon2 ...
-    Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim tau q0 q02 %CT_break CT_max 
+    Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim tau q0 q02 m %CT_break CT_max 
 
 alpha = 0.18;             %(probability -> unitless)
-C = 5;                    %Error for large c and small alpha   (1/day)
+C = 3;                    %Error for large c and small alpha   (1/day)
 bc = 0.5;                 %reduction in contacts|symptomatic?  (unitless)
 ba = 0.75;                %reduction in infectiousness         (unitless)
 tau = 2;                  %Estimates time from entering Ic to CTing  (days)
@@ -31,8 +31,9 @@ totalpop = 5.2e5;            %Population of Newfoundland     (people)
 vmax = 462000;               %# of people eligible for vaccine  (unitless)
 vstop = 0.5;                 %stop CTing when vstop people are vaccinated (unitless)
 
+
 %Need to put this a little high
-Tf = 300;                    %days of simulation (days)
+Tf = 90;                    %days of simulation (days)
 
 %%I will first leave out these effect
 %CT_break = 420;              %Pop in Ic when CTing breaks down  
@@ -55,24 +56,33 @@ sv2=0;
 e1=0;
 s = [s0; e0; ip0; ic0; ia0; Q0; sq0; sv1; iv1; iv2; r0; sv2; e1];
 
-q02 = 0.8; % percentage of symptomatic that contact traces
-Iclim = 10;
+m = 0;
 
 %% We plot the number of infected people of the infectious period for different q0 and Iclim 
 
 %Number of iteractions for variable 1 (Nsteps) and variable 2 (Msteps).
 
-Nsteps = 10;
-Msteps = 10;
+Nsteps = 4;
+Msteps = 4;
 
 %Step size of the iteractions
 dq0 = 0.1;
-dIclim = 1;
-
+dq02 = 0.1;
+%dC = 0.2;
 %All combinations of all numbers in this vectors will be tested
-q0v = 0:dq0:(Nsteps*dq0);  % accuracy of contact tracing, initial value
-q02v = 0:dq0:(Msteps*dq0);
 
+q0in = 0.6;
+q02in = 0.6;
+q0v = q0in:dq0:(Nsteps*dq0+q0in);  % accuracy of contact tracing, initial value
+q02v = q02in:dq02:(Nsteps*dq02+q02in);
+
+C = 4;
+%Cin = 2;
+%Cvec = Cin:dC:(Msteps*dC+Cin);  % accuracy of contact tracing, initial value
+
+Iclimin = 1;
+dIclim = 1;
+Iclimv = Iclimin:dIclim:(Msteps*dIclim+Iclimin);
 %Here is the matrix where the final size of the outbreak for each
 %combination of the two variables will be saved
 Tinf = zeros(Nsteps,Msteps);
@@ -82,11 +92,14 @@ for j = 1:Msteps
     
     %If you want to change variables, just change the two variables of
     %interest here
-             q0 = q0v(i);
-            q02 = q02v(j);
-   
-sol = dde23(@CTeq,[1, 2, 3, 4, 5], s,[0 Tf]);
+             q0 = sqrt(q0v(i));
+            q02 = sqrt(q02v(i));
+            
+    Iclim = Iclimv(j);
+            
 
+sol = dde23(@CTeq,[1, 2, 3, 4, 5], s,[0 Tf]);
+%figure(2);plot(sol.x,sol.y(13,:));hold on;plot(sol.x,sol.y(4,:))
 %Tnum is the vector with the cumulative size of the epidemic at end point
 %in time
 Tnum = sol.y(13,:);
@@ -99,18 +112,25 @@ Tinf(i,j) = Tnum(end);
  end
 end
 
+%Tinf= log(Tinf);
 figure(1)
-image(q0v,q02v,Tinf)
-%colorbar
-c = hot(5.22e5);
-colormap(c);
+%(Put first j variable in x position, then i variable in y position)
+image(Iclimv,sqrt(q02v).*sqrt(q0v),Tinf,'CDataMapping','scaled')
+colorbar
+%c = hot(100);
+%colormap(c);
 %colormap winter
 %mycolors = [1 0 0; 1 1 0; 0 0 1];
 %colormap(mycolors);
-xlabel('q0')
-ylabel('q02')
+ylabel('q_02*q_0 [contact tracing efficiency]')
+xlabel('Iclim [Ic when CT starts]')
 set(gca,'fontsize',14)
 set(gca,'YDir','normal') 
+
+
+
+
+
 
 %figure(1);
 %plot(sol.x,sol.y(1,:), 'g')
