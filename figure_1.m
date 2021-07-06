@@ -73,7 +73,9 @@ hold on
 plot(sol.x,(sol.y(6,:)), 'r')
 hold on
 plot(sol.x,(sol.y(14,:)), 'k')
-legend('Ic','Ia + Ip','Cumulative cases','Quarantine','Cumulative Quarantine','Location','Best')
+hold on
+plot(sol.x,(sol.y(7,:)), 'b')
+legend('Ic','Ia + Ip','Cumulative cases','Quarantine','Cumulative Quarantine','Sq','Location','Best')
 xlabel('time [days]');
 ylabel('Population');
 
