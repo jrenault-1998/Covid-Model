@@ -124,4 +124,6 @@ dy(12) = v*N*R/(S+R) + deltaIv*Iv1 + deltaIv*Iv2 + deltaSv1*Sv1 - Sv2*alpha*Cv*(
 
 dy(13) = deltaE*E;
 
+dy(14)  = (D)*q*alpha*C*(bc*(S+S1)+S2+S3+S4)/N + q*D;
+
 end
