@@ -7,7 +7,7 @@ global alpha C bc ba deltaE deltaIc deltaIa totalpop r epsilon1 epsilon2 ...
     Cv deltaSq deltaSv1 deltaIv deltaQ N deltaIp v vmax vstop Tf Iclim tau q0 q02 m %CT_break CT_max 
 
 alpha = 0.18;             %(probability -> unitless)
-C = 6;                    %Error for large c and small alpha   (1/day)
+C = 3;                    %Error for large c and small alpha   (1/day)
 bc = 0.5;                 %reduction in contacts|symptomatic?  (unitless)
 ba = 0.75;                %reduction in infectiousness         (unitless)
 tau = 2;                  %Estimates time from entering Ic to CTing  (days)
@@ -15,19 +15,19 @@ deltaE = 1/4;             %All "deltaX" terms are (1/days)
 deltaIp = 1/3;            %2.4days is right, but needs to be whole number
 deltaIc = 1/3.2;          %1/3.2
 deltaIa = 1/7;
-deltaSq = 1/10;              %How long are people told to isolate for?
-deltaIv = 1/5;               %Average time spent infectious|vaccinated?
+deltaSq = 1/10;           %How long are people told to isolate for?
+deltaIv = 1/5;            %Average time spent infectious|vaccinated?
 deltaQ = 1/10;
-deltaSv1 = 1/60;            %Days between first and second dose?
-r = 0.7;                    % (unitless)
-epsilon1 = 0.6;             % (unitless)
-epsilon2 = 0.8;             % (unitless)
-Cv = C + 0.5;                %increase by some constant? (1/day)
-v = 0.06/7;                  %0.06 of pop. every week  (unitless)
-N = 5.2e5;                   %(people)
-totalpop = 5.2e5;            %Population of Newfoundland     (people)    
-vmax = 462000;               %# of people eligible for vaccine  (unitless)
-vstop = 0.5;                 %stop CTing when vstop people are vaccinated (unitless)
+deltaSv1 = 1/100;         %Days between first and second dose?
+r = 0.7;                  % (unitless)
+epsilon1 = 0.6;           % (unitless)
+epsilon2 = 0.8;           % (unitless)
+Cv = C + 0.5;             %increase by some constant? (1/day)
+v = 0;%0.06/7;            %0.06 of pop. every week  (unitless)
+N = 5.2e5;                %(people)
+totalpop = 5.2e5;         %Population of Newfoundland     (people)    
+vmax = 462000;            %# of people eligible for vaccine  (unitless)
+vstop = 0.5;              %stop CTing when vstop people are vaccinated (unitless)
 q0 = 0.9;
 q02 = 0.9;
 Iclim = 3;
@@ -75,6 +75,7 @@ hold on
 plot(sol.x,(sol.y(14,:)), 'k')
 hold on
 plot(sol.x,(sol.y(7,:)), 'b')
+ylim([0,inf]);
 legend('Ic','Ia + Ip','Cumulative cases','Quarantine','Cumulative Quarantine','Sq','Location','Best')
 xlabel('time [days]');
 ylabel('Population');
