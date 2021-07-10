@@ -30,7 +30,7 @@ vmax = 462000;               %# of people eligible for vaccine  (unitless)
 vstop = 0.5;                 %stop CTing when vstop people are vaccinated (unitless)
 q0 = 0.9;
 q02 = 0.9;
-Iclim = 3;
+Iclim0 = 3;
 
 
 %Need to put this a little high
@@ -55,7 +55,8 @@ iv2=0;
 r0=0;
 sv2=0;
 e1=0;
-s = [s0; e0; ip0; ic0; ia0; Q0; sq0; sv1; iv1; iv2; r0; sv2; e1];
+Q1=0;
+s = [s0; e0; ip0; ic0; ia0; Q0; sq0; sv1; iv1; iv2; r0; sv2; e1; Q1];
 
 m = 0;
 
@@ -68,14 +69,14 @@ Msteps = 6;
 
 %Step size of the iteractions
 dq0 = 0.15;
-dm = 0.02;
+dm = 0.1;
 %All combinations of all numbers in this vectors will be tested
 
 q0in = 0.1;
 q0v = q0in:dq0:(Nsteps*dq0+q0in);  % accuracy of contact tracing, initial value
 
-alphain = 0.12;
-alphavec = alphain:dalpha:(Msteps*dalpha+alphain);  % infectiousness of COVID, initial value
+min = 0.12;
+mvec = min:dm:(Msteps*dm+min);  % infectiousness of COVID, initial value
 
 %Here is the matrix where the final size of the outbreak for each
 %combination of the two variables will be saved
@@ -87,7 +88,7 @@ for j = 1:Msteps
     %If you want to change variables, just change the two variables of
     %interest here
              q0 = q0v(i);
-             alpha = alphavec(j);
+             m = mvec(j);
             
     Iclim = Iclim0;
             
@@ -109,7 +110,7 @@ end
 %Tinf= log(Tinf);
 figure(1)
 %(Put first j variable in x position, then i variable in y position)
-image(alphavec,q0v,Tinf,'CDataMapping','scaled')
+image(mvec,q0v,Tinf,'CDataMapping','scaled')
 colorbar
 %c = hot(100);
 %colormap(c);
@@ -117,6 +118,6 @@ colorbar
 %mycolors = [1 0 0; 1 1 0; 0 0 1];
 %colormap(mycolors);
 ylabel('q_0 [contact tracing efficiency]')
-xlabel('alpha [COVID Infectiousness]')
+xlabel('m [Importation Rate]')
 set(gca,'fontsize',14)
 set(gca,'YDir','normal')  
