@@ -15,19 +15,19 @@ deltaE = 1/4;             %All "deltaX" terms are (1/days)
 deltaIp = 1/3;            %2.4days is right, but needs to be whole number
 deltaIc = 1/3.2;          %1/3.2
 deltaIa = 1/7;
-deltaSq = 1/10;              %How long are people told to isolate for?
-deltaIv = 1/5;               %Average time spent infectious|vaccinated?
+deltaSq = 1/10;           %How long are people told to isolate for?
+deltaIv = 1/5;            %Average time spent infectious|vaccinated?
 deltaQ = 1/10;
-deltaSv1 = 1/100;            %Days between first and second dose?
-r = 0.7;                    % (unitless)
-epsilon1 = 0.6;             % (unitless)
-epsilon2 = 0.8;             % (unitless)
-Cv = C + 0.5;                %increase by some constant? (1/day)
-v = 0;%0.06/7;                  %0.06 of pop. every week  (unitless)
-N = 5.2e5;                   %(people)
-totalpop = 5.2e5;            %Population of Newfoundland     (people)    
-vmax = 462000;               %# of people eligible for vaccine  (unitless)
-vstop = 0.5;                 %stop CTing when vstop people are vaccinated (unitless)
+deltaSv1 = 1/100;         %Days between first and second dose?
+r = 0.7;                  % (unitless)
+epsilon1 = 0.6;           % (unitless)
+epsilon2 = 0.8;           % (unitless)
+Cv = C + 0.5;             %increase by some constant? (1/day)
+v = 0;%0.06/7;            %0.06 of pop. every week  (unitless)
+N = 5.2e5;                %(people)
+totalpop = 5.2e5;         %Population of Newfoundland     (people)    
+vmax = 462000;            %# of people eligible for vaccine  (unitless)
+vstop = 0.5;              %stop CTing when vstop people are vaccinated (unitless)
 q0 = 0.9;
 q02 = 0.9;
 Iclim0 = 3;
@@ -60,7 +60,7 @@ s = [s0; e0; ip0; ic0; ia0; Q0; sq0; sv1; iv1; iv2; r0; sv2; e1; Q1];
 
 m = 0;
 
-%% We plot the number of infected people of the infectious period for different CT efficiency(q) x importation rate(m)
+%% We plot the number of infected people of the infectious period for different Infectiousness(alpha) x Importation rates(m)
 
 %Number of iteractions for variable 1 (Nsteps) and variable 2 (Msteps).
 
@@ -68,12 +68,12 @@ Nsteps = 6;
 Msteps = 6;
 
 %Step size of the iteractions
-dq0 = 0.15;
+dalpha = 0.02;
 dm = 0.1;
 %All combinations of all numbers in this vectors will be tested
 
-q0in = 0.1;
-q0v = q0in:dq0:(Nsteps*dq0+q0in);  % accuracy of contact tracing, initial value
+alphain = 0.12;
+alphavec = alphain:dalpha:(Nsteps*dalpha+alphain);  % Infectiousness of COVID
 
 min = 0.12;
 mvec = min:dm:(Msteps*dm+min);  % infectiousness of COVID, initial value
@@ -87,7 +87,7 @@ for j = 1:Msteps
     
     %If you want to change variables, just change the two variables of
     %interest here
-             q0 = q0v(i);
+             alpha = alphavec(i);
              m = mvec(j);
             
     Iclim = Iclim0;
@@ -110,14 +110,14 @@ end
 %Tinf= log(Tinf);
 figure(1)
 %(Put first j variable in x position, then i variable in y position)
-image(mvec,q0v,Tinf,'CDataMapping','scaled')
+image(mvec,alphavec,Tinf,'CDataMapping','scaled')
 colorbar
 %c = hot(100);
 %colormap(c);
 %colormap winter
 %mycolors = [1 0 0; 1 1 0; 0 0 1];
 %colormap(mycolors);
-ylabel('q_0 [contact tracing efficiency]')
+ylabel('alpha [COVID Infectiousness]')
 xlabel('m [Importation Rate]')
 set(gca,'fontsize',14)
 set(gca,'YDir','normal') 
