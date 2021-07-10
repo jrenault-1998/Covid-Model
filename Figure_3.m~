@@ -59,31 +59,24 @@ s = [s0; e0; ip0; ic0; ia0; Q0; sq0; sv1; iv1; iv2; r0; sv2; e1];
 
 m = 0;
 
-%% We plot the number of infected people of the infectious period for different q0 and Iclim 
+%% We plot the number of infected people of the infectious period for different importation rate(m) x CT efficiency(q)
 
 %Number of iteractions for variable 1 (Nsteps) and variable 2 (Msteps).
 
-Nsteps = 4;
-Msteps = 4;
+Nsteps = 6;
+Msteps = 6;
 
 %Step size of the iteractions
-dq0 = 0.1;
-dq02 = 0.1;
-dC = 0.2;
+dq0 = 0.15;
+dalpha = 0.02;
 %All combinations of all numbers in this vectors will be tested
 
-q0in = 0.6;
-q02in = 0.6;
+q0in = 0.1;
 q0v = q0in:dq0:(Nsteps*dq0+q0in);  % accuracy of contact tracing, initial value
-q02v = q02in:dq02:(Nsteps*dq02+q02in);
 
-%C = 4;
-Cin = 3;
-Cvec = Cin:dC:(Msteps*dC+Cin);  % accuracy of contact tracing, initial value
+alphain = 0.12;
+alphavec = alphain:dalpha:(Msteps*dalpha+alphain);  % infectiousness of COVID, initial value
 
-%Iclimin = 1;
-%dIclim = 1;
-%Iclimv = Iclimin:dIclim:(Msteps*dIclim+Iclimin);
 %Here is the matrix where the final size of the outbreak for each
 %combination of the two variables will be saved
 Tinf = zeros(Nsteps,Msteps);
@@ -93,11 +86,10 @@ for j = 1:Msteps
     
     %If you want to change variables, just change the two variables of
     %interest here
-             q0 = sqrt(q0v(i));
-            q02 = sqrt(q02v(i));
+             q0 = q0v(i);
+             alpha = alphavec(j);
             
-    C = Cvec(j);   % C isn't properly changing
-    Iclim = 3;
+    Iclim = Iclim0;
             
 
 sol = dde23(@CTeq,[1, 2, 3, 4, 5], s,[0 Tf]);
@@ -116,17 +108,15 @@ end
 
 %Tinf= log(Tinf);
 figure(1)
-%subplot(1,3,1);
-%plot(sol.x,sol.y(1,:),'k','Linewidth',1,5);
 %(Put first j variable in x position, then i variable in y position)
-image(Cvec,sqrt(q02v).*sqrt(q0v),Tinf,'CDataMapping','scaled')
+image(alphavec,q0v,Tinf,'CDataMapping','scaled')
 colorbar
 %c = hot(100);
 %colormap(c);
 %colormap winter
 %mycolors = [1 0 0; 1 1 0; 0 0 1];
 %colormap(mycolors);
-ylabel('q_02*q_0 [contact tracing efficiency]')
-xlabel('C')
+ylabel('q_0 [contact tracing efficiency]')
+xlabel('alpha [COVID Infectiousness]')
 set(gca,'fontsize',14)
 set(gca,'YDir','normal')  
