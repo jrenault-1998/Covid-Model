@@ -19,9 +19,10 @@ deltaIc = 1/3.2;          %1/3.2
 deltaIa = 1/7;
 deltaSq = 1/10;           %How long are people told to isolate for?
 deltaQ = 1/10;
-r = 0.7;                  % (unitless)
+ruv = 0.7;                  % (unitless)
 N = 5.22e5;                % Pop of NL
 q0 = 0.9;                  %CT efficiency
+rv = 0.15;                % r for vaccinated individuals
 
 Iclim0 = 0; %Number of symptomatic cases before CT starts
 CT_break = 420; %Pop in Ic when CTing breaks down  
@@ -55,16 +56,22 @@ if choice == 1
 p1 = 0.0;
 p2 = 0.75;
 s0= (1-p1-p2)*N+p1*N*(1-0.332)+p2*N*(1-0.879);
+r = (ruv*s0 + rv*(N-s0))/N;
+
 
 elseif choice == 2
 p1 = 0.0;
 p2 = 0.8;
 s0= (1-p1-p2)*N+p1*N*(1-0.332)+p2*N*(1-0.879);
+r = (ruv*s0 + rv*(N-s0))/N;
+
 
 elseif choice == 3
 p1 = 0.0;
 p2 = 0.85;
 s0= (1-p1-p2)*N+p1*N*(1-0.332)+p2*N*(1-0.879);
+r = (ruv*s0 + rv*(N-s0))/N;
+
 
 %%% N-s0 %people that cannot be infected or infect.
 
@@ -72,6 +79,8 @@ elseif choice == 4
 p1 = 0.0;
 p2 = 0.9;
 s0= (1-p1-p2)*N+p1*N*(1-0.332)+p2*N*(1-0.879);
+r = (ruv*s0 + rv*(N-s0))/N;
+
 
 end
 

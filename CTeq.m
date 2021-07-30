@@ -79,7 +79,7 @@ dy(5)  = (1-r)*deltaE*E - (D)*(1-r)*q*alpha*C*(S4)/N - deltaIa*Ia ;
 dy(6)  = (D)*q*alpha*C*(bc*(S+S1)+S2+S3+S4)/N + q*D - deltaQ*Q;
 
 %Sq                %From S                                    %To S
-%%!! Does not include vaccinated individuals put in quarantine!!
+%%!! Does not include all vaccinated individuals put in quarantine!!
 dy(7)  = (D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/N - deltaSq*Sq; 
 
 %R       %From Ic      %From Ia    %From Q   %Got Vaccine
