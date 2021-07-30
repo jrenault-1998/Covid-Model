@@ -1,8 +1,6 @@
 function dy = CTeq(t,y, Z)
 
-global alpha C bc ba deltaE deltaIp deltaIc deltaIa deltaQ r epsilon1 epsilon2 Cv  v deltaSq deltaSv1 deltaIv N vmax Iclim ...
- q0 q02 m
-
+global alpha C bc ba deltaE deltaIp deltaIc deltaIa deltaQ r deltaSq N Iclim q0 CT_break s0
 
 ylag1 = Z(:,1);     %For Z(:,i), these values are t-i days before
 ylag2 = Z(:,2);
@@ -23,22 +21,12 @@ Ic = y(4);
 Ia = y(5);
 Q  = y(6);
 Sq = y(7);
-Sv1 = y(8);
-Iv1 = y(9);
-Iv2 = y(10);
-R  = y(11);
-Sv2 = y(12);
-
-
+R  = y(8);
+F = y(9); %Final size of the epidemic
+Tq = y(10); %Total size of people in quaratine (infectious)
+Tqs = y(11); %Total size of people in quaratine (not infectious)
 
 dy = zeros(11,1);
-
-
-
-if Sv1 + Iv1 + Iv2 + Sv2 > vmax             %Vaccination stops at %population eligible
-    v=0;
-end
-
 
 if (Ic > Iclim)  
     Iclim = 0;
@@ -49,16 +37,11 @@ steepness = 1000;
 shift = pi/2;
 
 function q = qtan(Ic)
-%  if Ic < CT_break
       q = q0*(1/pi*(atan(steepness*(Ic-Iclim))+shift));
-      
-%  else
- %     q = q0*(1/pi*(atan(steepness*(Ic-Iclim))+shift))*exp(-(1/10)*(Ic - CT_break));
-      
- % end
 end
 
 
+% To see function q
 % steepness = 100; 
 % shift = pi/2; 
 % Iclim = 10;
@@ -69,61 +52,65 @@ end
 % plot(Ic,q)
 
 
-
-D = q02*E5*r*deltaE;
+D = E5*r*deltaE;
 q = qtan(Ic);
 
-% if (D > Ic)
-%    D = 0;
-% end
 
+% Stop running the code if CT capacity is overloaded
 
-% 
-% if (Sv1 + Iv1 + Iv2 + Sv2 > vstop)            %Contact tracing stops at %population vaccinated
-%     q = 0;    
-% end
-
-
+if Ic <= CT_break
 
 %S            %Exposed                                    %Contact Traced
-dy(1)  = -S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/N - v*N*S/(S+R) + deltaSq*Sq;
+dy(1)  = -S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/N + deltaSq*Sq;
 
 %E            %From S                                     %Contact Traced
 dy(2)  = S*alpha*C*(Ip+bc*Ic+ba*Ia)/N - (D)*q*alpha*C*(bc*(S+S1)+S2+S3)/N - deltaE*E;
 
 %Ip       %From E                %Contact Traced        %To Ic
-dy(3)  = r*deltaE*E - (D)*r*q*alpha*C*(S4)/N - deltaIp*Ip + r*m;
+dy(3)  = r*deltaE*E - (D)*r*q*alpha*C*(S4)/N - deltaIp*Ip ;
 
 %Ic                     %To R
 dy(4)  = deltaIp*Ip - deltaIc*Ic - q*D;
 
 %Ia        %From E               %Contact Traced                %To R
-dy(5)  = (1-r)*deltaE*E - (D)*(1-r)*q*alpha*C*(S4)/N - deltaIa*Ia + (1-r)*m;
+dy(5)  = (1-r)*deltaE*E - (D)*(1-r)*q*alpha*C*(S4)/N - deltaIa*Ia ;
 
 %Q                 %From E, Ip and Ia                    %To R
 dy(6)  = (D)*q*alpha*C*(bc*(S+S1)+S2+S3+S4)/N + q*D - deltaQ*Q;
 
 %Sq                %From S                                    %To S
+%%!! Does not include vaccinated individuals put in quarantine!!
 dy(7)  = (D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/N - deltaSq*Sq; 
 
-%Sv1     %From S                 %To Iv1                            %To Sv2
-dy(8)  = v*N*S/(S+R) - Sv1*alpha*Cv*(1-epsilon1)*(Ip+bc*Ic+ba*Ia)/N - deltaSv1*Sv1;
-
-%Iv1                %From Sv1                            %To Sv2
-dy(9)  = Sv1*alpha*Cv*(1-epsilon1)*(Ip+bc*Ic+ba*Ia)/N - deltaIv*Iv1;
-
-%Iv2                %From Sv2                            %To Sv2
-dy(10) = Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N - deltaIv*Iv2;
-
 %R       %From Ic      %From Ia    %From Q   %Got Vaccine
-dy(11) = deltaIc*Ic + deltaIa*Ia + deltaQ*Q - v*N*R/(S+R);
+dy(8) = deltaIc*Ic + deltaIa*Ia + deltaQ*Q ;
 
-%Sv2      %------Vaccine & Recovered--------        %2nd Dose     %To Iv2
-dy(12) = v*N*R/(S+R) + deltaIv*Iv1 + deltaIv*Iv2 + deltaSv1*Sv1 - Sv2*alpha*Cv*(1-epsilon2)*(Ip+bc*Ic+ba*Ia)/N;
+%F %Final size of the epidemic (cumulative number of people getting sick)
+dy(9) = deltaE*E;
+
+%Tq %Cumulative number of people in quarantine (infected)
+dy(10)  = (D)*q*alpha*C*(bc*(S+S1)+S2+S3+S4)/N + q*D;
+
+%Tqs %Cumulative number of people in quarantine (infected and not)
+dy(11)  = (D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/N + ((D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/N)*(N-s0)/S;
+%dy(11) = (D)*q*(1-alpha)*C*(bc*(S+S1)+S2+S3+S4)/N * (2-s0/N);
 
 
-dy(13) = deltaE*E;
 
-dy(14)  = (D)*q*alpha*C*(bc*(S+S1)+S2+S3+S4)/N + q*D;
+else
+
+dy(1)  = 0;
+dy(2)  = 0;
+dy(3)  = 0;
+dy(4)  = 0;
+dy(5)  = 0;
+dy(6)  = 0;
+dy(7)  = 0; 
+dy(8) = 0;
+dy(9) = 0;
+dy(10)  = 0;
+
+end
+
 
 end
